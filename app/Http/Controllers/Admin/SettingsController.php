@@ -13,12 +13,12 @@ class SettingsController extends Controller
     public function index(): View
     {
         $settings = [
-            'site_name' => SiteSetting::get('site_name', 'LinkFolio'),
+            'site_name' => SiteSetting::get('site_name', 'DropLaunch'),
             'site_description' => SiteSetting::get('site_description', 'Create your personal portfolio page'),
             'site_keywords' => SiteSetting::get('site_keywords', 'portfolio, links, bio'),
             'premium_price' => SiteSetting::get('premium_price', '9.99'),
             'premium_currency' => SiteSetting::get('premium_currency', 'USD'),
-            'contact_email' => SiteSetting::get('contact_email', 'admin@linkfolio.com'),
+            'contact_email' => SiteSetting::get('contact_email', 'admin@droplaunch.dev'),
             'footer_text' => SiteSetting::get('footer_text', ''),
         ];
 

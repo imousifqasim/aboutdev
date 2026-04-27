@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Register - LinkFolio')
+@section('title', 'Register - DropLaunch')
 
 @section('content')
 <div class="min-h-[calc(100vh-8rem)] flex items-center justify-center py-12 px-4">
@@ -21,7 +21,7 @@
                     <div>
                         <label for="username" class="block text-sm font-medium mb-2">Username</label>
                         <div class="flex items-center">
-                            <span class="px-3 py-3 bg-gray-100 dark:bg-gray-600 border border-r-0 border-gray-300 dark:border-gray-600 rounded-l-xl text-gray-500 dark:text-gray-400 text-sm">linkfolio.com/</span>
+                            <span class="px-3 py-3 bg-gray-100 dark:bg-gray-600 border border-r-0 border-gray-300 dark:border-gray-600 rounded-l-xl text-gray-500 dark:text-gray-400 text-sm">droplaunch.dev/</span>
                             <input type="text" name="username" id="username" value="{{ old('username') }}" required
                                 class="flex-1 px-4 py-3 rounded-r-xl border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none transition">
                         </div>

@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>@yield('title', 'LinkFolio - Your Personal Portfolio')</title>
+    <title>@yield('title', 'DropLaunch - Your Personal Portfolio')</title>
     <meta name="description" content="@yield('description', 'Create your personal portfolio page')">
     @yield('meta')
     <script src="https://cdn.tailwindcss.com"></script>

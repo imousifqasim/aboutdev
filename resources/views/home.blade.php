@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'LinkFolio - Create Your Personal Portfolio Page')
+@section('title', 'DropLaunch - Create Your Personal Portfolio Page')
 @section('description', 'Build a beautiful portfolio page with all your important links. Share your work, social profiles, and more in one place.')
 
 @section('content')
@@ -99,7 +99,7 @@
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Basic theme</li>
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Profile page</li>
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Basic analytics</li>
-                    <li class="text-gray-400"><i class="fas fa-times text-red-400 mr-2"></i> LinkFolio branding</li>
+                    <li class="text-gray-400"><i class="fas fa-times text-red-400 mr-2"></i> DropLaunch branding</li>
                 </ul>
                 <a href="{{ route('register') }}" class="block w-full text-center py-3 px-6 border-2 border-primary-600 text-primary-600 rounded-xl font-semibold hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">
                     Get Started
@@ -132,7 +132,7 @@
 <section class="py-20 gradient-bg">
     <div class="max-w-4xl mx-auto px-4 text-center text-white">
         <h2 class="text-3xl sm:text-4xl font-bold mb-4">Ready to Build Your Page?</h2>
-        <p class="text-xl text-white/80 mb-8">Join thousands of creators who use LinkFolio to share their work.</p>
+        <p class="text-xl text-white/80 mb-8">Join thousands of creators who use DropLaunch to share their work.</p>
         <a href="{{ route('register') }}" class="bg-white text-purple-700 px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-100 transition shadow-lg inline-block">
             <i class="fas fa-rocket mr-2"></i> Create Your Page Now
         </a>

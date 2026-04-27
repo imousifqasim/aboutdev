@@ -5,9 +5,9 @@
                 <div class="w-6 h-6 gradient-bg rounded flex items-center justify-center">
                     <i class="fas fa-link text-white text-xs"></i>
                 </div>
-                <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">LinkFolio</span>
+                <span class="text-sm font-semibold text-gray-600 dark:text-gray-400">DropLaunch</span>
             </div>
-            <p class="text-sm text-gray-500 dark:text-gray-400">&copy; {{ date('Y') }} LinkFolio. All rights reserved.</p>
+            <p class="text-sm text-gray-500 dark:text-gray-400">&copy; {{ date('Y') }} DropLaunch. All rights reserved.</p>
         </div>
     </div>
 </footer>

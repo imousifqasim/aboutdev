@@ -1,5 +1,5 @@
 @extends('layouts.app')
-@section('title', 'Reset Password - LinkFolio')
+@section('title', 'Reset Password - DropLaunch')
 
 @section('content')
 <div class="min-h-[calc(100vh-8rem)] flex items-center justify-center py-12 px-4">

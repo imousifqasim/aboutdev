@@ -1,4 +1,4 @@
-# LinkFolio - Personal Portfolio & Link-in-Bio SaaS Platform
+# DropLaunch - Personal Portfolio & Link-in-Bio SaaS Platform
 
 A complete full-stack SaaS web application similar to About.me / Linktree with a manual payment system. Built with Laravel 10, Blade, Tailwind CSS, and MySQL.
 
@@ -49,8 +49,8 @@ Supports: Binance (USDT), JazzCash, Raast ID, Meezan Bank
 
 ```bash
 # Clone the repository
-git clone <repo-url> linkfolio
-cd linkfolio
+git clone <repo-url> droplaunch
+cd droplaunch
 
 # Install dependencies
 composer install
@@ -62,7 +62,7 @@ cp .env.example .env
 php artisan key:generate
 
 # Configure database in .env
-DB_DATABASE=linkfolio
+DB_DATABASE=droplaunch
 DB_USERNAME=your_username
 DB_PASSWORD=your_password
 
@@ -83,8 +83,8 @@ php artisan serve
 
 | Role  | Email              | Password |
 |-------|--------------------|----------|
-| Admin | admin@linkfolio.com | password |
-| User  | demo@linkfolio.com  | password |
+| Admin | admin@droplaunch.dev | password |
+| User  | demo@droplaunch.dev  | password |
 
 ## Payment Methods Configuration
 

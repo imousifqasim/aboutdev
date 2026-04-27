@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{{ $profile->meta_title ?: $user->name . ' - LinkFolio' }}</title>
+    <title>{{ $profile->meta_title ?: $user->name . ' - DropLaunch' }}</title>
     <meta name="description" content="{{ $profile->meta_description ?: $profile->bio }}">
     <meta property="og:title" content="{{ $profile->meta_title ?: $user->name }}">
     <meta property="og:description" content="{{ $profile->meta_description ?: $profile->bio }}">
@@ -132,7 +132,7 @@
         @if($profile->show_branding)
             <div class="mt-12 text-center">
                 <a href="{{ url('/') }}" class="text-xs opacity-40 hover:opacity-60 transition">
-                    Made with LinkFolio
+                    Made with DropLaunch
                 </a>
             </div>
         @endif

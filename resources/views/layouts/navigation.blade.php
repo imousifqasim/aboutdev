@@ -6,7 +6,7 @@
                     <div class="w-8 h-8 gradient-bg rounded-lg flex items-center justify-center">
                         <i class="fas fa-link text-white text-sm"></i>
                     </div>
-                    <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">LinkFolio</span>
+                    <span class="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">DropLaunch</span>
                 </a>
             </div>
 

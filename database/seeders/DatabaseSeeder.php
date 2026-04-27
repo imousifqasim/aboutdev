@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
         // Create Admin User
         $admin = User::create([
             'name' => 'Admin',
-            'email' => 'admin@linkfolio.com',
+            'email' => 'admin@droplaunch.dev',
             'password' => Hash::make('password'),
             'role' => 'admin',
             'email_verified_at' => now(),
@@ -30,7 +30,7 @@ class DatabaseSeeder extends Seeder
         // Create Demo User
         $demo = User::create([
             'name' => 'Tousif Ahmad',
-            'email' => 'demo@linkfolio.com',
+            'email' => 'demo@droplaunch.dev',
             'password' => Hash::make('password'),
             'role' => 'user',
             'email_verified_at' => now(),
@@ -63,13 +63,13 @@ class DatabaseSeeder extends Seeder
 
         // Default Site Settings
         $settings = [
-            'site_name' => 'LinkFolio',
+            'site_name' => 'DropLaunch',
             'site_description' => 'Create your personal portfolio page and share your links with the world.',
             'site_keywords' => 'portfolio, links, bio, personal page, linktree alternative',
             'premium_price' => '9.99',
             'premium_currency' => 'USD',
-            'contact_email' => 'admin@linkfolio.com',
-            'footer_text' => 'Made with LinkFolio',
+            'contact_email' => 'admin@droplaunch.dev',
+            'footer_text' => 'Made with DropLaunch',
         ];
 
         foreach ($settings as $key => $value) {
