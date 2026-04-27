@@ -23,7 +23,7 @@ class ProfileController extends Controller
 
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:profiles,username,' . $profile->id],
+            'username' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:profiles,username,' . $profile->id, 'not_in:admin,dashboard,login,register,logout,forgot-password,reset-password,email,click,home,api,css,js,images,storage'],
             'bio' => ['nullable', 'string', 'max:1000'],
             'location' => ['nullable', 'string', 'max:255'],
             'company' => ['nullable', 'string', 'max:255'],

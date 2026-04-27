@@ -49,7 +49,8 @@ class UserController extends Controller
             return back()->with('error', 'Cannot ban an admin user.');
         }
 
-        $user->update(['is_banned' => !$user->is_banned]);
+        $user->is_banned = !$user->is_banned;
+        $user->save();
         $status = $user->is_banned ? 'banned' : 'unbanned';
         return back()->with('success', "User has been {$status}.");
     }

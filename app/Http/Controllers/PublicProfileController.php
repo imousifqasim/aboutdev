@@ -32,6 +32,10 @@ class PublicProfileController extends Controller
 
     public function trackClick(Link $link): RedirectResponse
     {
+        if (!$link->is_active || $link->user->is_banned) {
+            abort(404);
+        }
+
         $link->increment('clicks');
 
         Analytic::updateOrCreate(

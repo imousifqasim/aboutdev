@@ -18,9 +18,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@droplaunch.dev',
             'password' => Hash::make('password'),
-            'role' => 'admin',
             'email_verified_at' => now(),
         ]);
+        $admin->role = 'admin';
+        $admin->save();
 
         Profile::create([
             'user_id' => $admin->id,
@@ -32,7 +33,6 @@ class DatabaseSeeder extends Seeder
             'name' => 'Tousif Ahmad',
             'email' => 'demo@droplaunch.dev',
             'password' => Hash::make('password'),
-            'role' => 'user',
             'email_verified_at' => now(),
         ]);
 

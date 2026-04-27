@@ -25,7 +25,7 @@ class RegisterController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
-            'username' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:profiles,username'],
+            'username' => ['required', 'string', 'max:255', 'alpha_dash', 'unique:profiles,username', 'not_in:admin,dashboard,login,register,logout,forgot-password,reset-password,email,click,home,api,css,js,images,storage'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
