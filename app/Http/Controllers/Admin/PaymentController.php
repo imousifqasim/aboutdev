@@ -7,6 +7,7 @@ use App\Models\Payment;
 use App\Models\Subscription;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PaymentController extends Controller
@@ -32,51 +33,59 @@ class PaymentController extends Controller
 
     public function approve(Request $request, Payment $payment): RedirectResponse
     {
-        if ($payment->status !== 'pending') {
-            return back()->with('error', 'This payment has already been reviewed.');
-        }
+        return DB::transaction(function () use ($request, $payment) {
+            $payment = Payment::lockForUpdate()->find($payment->id);
 
-        $payment->update([
-            'status' => 'approved',
-            'admin_note' => $request->admin_note,
-            'reviewed_by' => $request->user()->id,
-            'reviewed_at' => now(),
-        ]);
+            if ($payment->status !== 'pending') {
+                return back()->with('error', 'This payment has already been reviewed.');
+            }
 
-        $user = $payment->user;
-        $profile = $user->profile;
-        $profile->update(['is_premium' => true, 'show_branding' => false]);
+            $payment->update([
+                'status' => 'approved',
+                'admin_note' => $request->admin_note,
+                'reviewed_by' => $request->user()->id,
+                'reviewed_at' => now(),
+            ]);
 
-        Subscription::where('user_id', $user->id)->where('is_active', true)->update(['is_active' => false]);
+            $user = $payment->user;
+            $profile = $user->profile;
+            $profile->update(['is_premium' => true, 'show_branding' => false]);
 
-        Subscription::create([
-            'user_id' => $user->id,
-            'plan' => 'premium',
-            'start_date' => now(),
-            'end_date' => now()->addYear(),
-            'is_active' => true,
-        ]);
+            Subscription::where('user_id', $user->id)->where('is_active', true)->update(['is_active' => false]);
 
-        return back()->with('success', 'Payment approved. User upgraded to Premium!');
+            Subscription::create([
+                'user_id' => $user->id,
+                'plan' => 'premium',
+                'start_date' => now(),
+                'end_date' => now()->addYear(),
+                'is_active' => true,
+            ]);
+
+            return back()->with('success', 'Payment approved. User upgraded to Premium!');
+        });
     }
 
     public function reject(Request $request, Payment $payment): RedirectResponse
     {
-        if ($payment->status !== 'pending') {
-            return back()->with('error', 'This payment has already been reviewed.');
-        }
-
         $request->validate([
             'admin_note' => ['required', 'string', 'max:500'],
         ]);
 
-        $payment->update([
-            'status' => 'rejected',
-            'admin_note' => $request->admin_note,
-            'reviewed_by' => $request->user()->id,
-            'reviewed_at' => now(),
-        ]);
+        return DB::transaction(function () use ($request, $payment) {
+            $payment = Payment::lockForUpdate()->find($payment->id);
 
-        return back()->with('success', 'Payment rejected.');
+            if ($payment->status !== 'pending') {
+                return back()->with('error', 'This payment has already been reviewed.');
+            }
+
+            $payment->update([
+                'status' => 'rejected',
+                'admin_note' => $request->admin_note,
+                'reviewed_by' => $request->user()->id,
+                'reviewed_at' => now(),
+            ]);
+
+            return back()->with('success', 'Payment rejected.');
+        });
     }
 }

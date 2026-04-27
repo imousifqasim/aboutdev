@@ -18,8 +18,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@droplaunch.dev',
             'password' => Hash::make('password'),
-            'email_verified_at' => now(),
         ]);
+        $admin->email_verified_at = now();
         $admin->role = 'admin';
         $admin->save();
 
@@ -33,8 +33,9 @@ class DatabaseSeeder extends Seeder
             'name' => 'Tousif Ahmad',
             'email' => 'demo@droplaunch.dev',
             'password' => Hash::make('password'),
-            'email_verified_at' => now(),
         ]);
+        $demo->email_verified_at = now();
+        $demo->save();
 
         $profile = Profile::create([
             'user_id' => $demo->id,

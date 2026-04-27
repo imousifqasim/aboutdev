@@ -24,7 +24,7 @@ class DashboardController extends Controller
 
         $chartData = [];
         for ($i = 29; $i >= 0; $i--) {
-            $date = now()->subDays($i)->format('Y-m-d');
+            $date = now()->subDays($i)->startOfDay();
             $dayData = $recentAnalytics->firstWhere('date', $date);
             $chartData[] = [
                 'date' => now()->subDays($i)->format('M d'),
