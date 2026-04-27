@@ -30,6 +30,18 @@
     <i class="fas fa-credit-card w-5"></i>
     <span>Subscription</span>
 </a>
+<a href="{{ route('email-signature') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('email-signature') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+    <i class="fas fa-envelope w-5"></i>
+    <span>Email Signature</span>
+</a>
+<a href="{{ route('messages.index') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-lg text-sm font-medium {{ request()->routeIs('messages.*') ? 'bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-400' : 'text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700' }}">
+    <i class="fas fa-inbox w-5"></i>
+    <span>Messages</span>
+    @php $unreadCount = auth()->user()->contactMessages()->where('is_read', false)->count(); @endphp
+    @if($unreadCount > 0)
+        <span class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5">{{ $unreadCount }}</span>
+    @endif
+</a>
 
 <hr class="my-4 dark:border-gray-700">
 

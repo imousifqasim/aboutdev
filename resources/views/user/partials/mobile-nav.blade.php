@@ -14,3 +14,11 @@
     <i class="fas fa-crown text-lg"></i>
     <span class="text-xs mt-1">Premium</span>
 </a>
+<a href="{{ route('messages.index') }}" class="flex flex-col items-center py-1 px-3 relative {{ request()->routeIs('messages.*') ? 'text-primary-600' : 'text-gray-500' }}">
+    <i class="fas fa-inbox text-lg"></i>
+    <span class="text-xs mt-1">Messages</span>
+    @php $unreadMobile = auth()->user()->contactMessages()->where('is_read', false)->count(); @endphp
+    @if($unreadMobile > 0)
+        <span class="absolute top-0 right-1 bg-red-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center" style="font-size: 10px;">{{ $unreadMobile }}</span>
+    @endif
+</a>

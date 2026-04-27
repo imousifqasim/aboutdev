@@ -68,6 +68,32 @@ Route::middleware(['auth', 'verified', 'check.banned'])->prefix('dashboard')->gr
     // Payments & Subscription
     Route::get('/payments', [PaymentController::class, 'index'])->name('payments.index');
     Route::post('/payments', [PaymentController::class, 'store'])->name('payments.store');
+
+    // Spotlight Button
+    Route::put('/profile/spotlight', [ProfileController::class, 'updateSpotlight'])->name('profile.spotlight');
+
+    // Testimonials
+    Route::post('/profile/testimonials', [ProfileController::class, 'updateTestimonials'])->name('profile.testimonials');
+    Route::delete('/profile/testimonials/{index}', [ProfileController::class, 'removeTestimonial'])->name('profile.testimonials.remove');
+
+    // Resume/CV
+    Route::post('/profile/resume', [ProfileController::class, 'updateResume'])->name('profile.resume');
+    Route::delete('/profile/resume/{type}/{index}', [ProfileController::class, 'removeResumeItem'])->name('profile.resume.remove');
+
+    // Contact Form Toggle
+    Route::patch('/profile/contact-form', [ProfileController::class, 'toggleContactForm'])->name('profile.contact-form');
+
+    // Background Image
+    Route::post('/profile/background', [ProfileController::class, 'updateBackground'])->name('profile.background');
+    Route::delete('/profile/background', [ProfileController::class, 'removeBackground'])->name('profile.background.remove');
+
+    // Email Signature
+    Route::get('/email-signature', [ProfileController::class, 'emailSignature'])->name('email-signature');
+
+    // Messages
+    Route::get('/messages', [ProfileController::class, 'messages'])->name('messages.index');
+    Route::patch('/messages/{message}/read', [ProfileController::class, 'markMessageRead'])->name('messages.read');
+    Route::delete('/messages/{message}', [ProfileController::class, 'deleteMessage'])->name('messages.destroy');
 });
 
 // Admin Routes
@@ -97,6 +123,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 // Link Click Tracking
 Route::get('/click/{link}', [PublicProfileController::class, 'trackClick'])->name('link.click');
+
+// Contact Form Submission
+Route::post('/{username}/contact', [PublicProfileController::class, 'sendMessage'])->name('profile.contact');
 
 // Public Profile (must be last - catches /{username})
 Route::get('/{username}', [PublicProfileController::class, 'show'])->name('profile.show');

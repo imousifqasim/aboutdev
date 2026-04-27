@@ -72,6 +72,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasMany(Analytic::class);
     }
 
+    public function contactMessages(): HasMany
+    {
+        return $this->hasMany(ContactMessage::class);
+    }
+
     public function isPremium(): bool
     {
         return $this->profile && $this->profile->is_premium;

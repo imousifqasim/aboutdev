@@ -78,6 +78,48 @@
                 <h3 class="text-xl font-semibold mb-3">SEO Optimized</h3>
                 <p class="text-gray-600 dark:text-gray-400">Built-in SEO with meta tags and Open Graph for better visibility.</p>
             </div>
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                <div class="w-14 h-14 bg-pink-100 dark:bg-pink-900/50 rounded-xl flex items-center justify-center mb-5">
+                    <i class="fas fa-star text-pink-600 dark:text-pink-400 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Spotlight Button</h3>
+                <p class="text-gray-600 dark:text-gray-400">Add a prominent CTA button to drive visitors to your most important action.</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                <div class="w-14 h-14 bg-cyan-100 dark:bg-cyan-900/50 rounded-xl flex items-center justify-center mb-5">
+                    <i class="fas fa-envelope text-cyan-600 dark:text-cyan-400 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Email Signature</h3>
+                <p class="text-gray-600 dark:text-gray-400">Generate a professional email signature with your profile info and links.</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                <div class="w-14 h-14 bg-amber-100 dark:bg-amber-900/50 rounded-xl flex items-center justify-center mb-5">
+                    <i class="fas fa-quote-left text-amber-600 dark:text-amber-400 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Testimonials</h3>
+                <p class="text-gray-600 dark:text-gray-400">Showcase endorsements from clients and partners to build trust.</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                <div class="w-14 h-14 bg-teal-100 dark:bg-teal-900/50 rounded-xl flex items-center justify-center mb-5">
+                    <i class="fas fa-file-alt text-teal-600 dark:text-teal-400 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Resume / CV</h3>
+                <p class="text-gray-600 dark:text-gray-400">Display your experience, education, and skills right on your profile.</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                <div class="w-14 h-14 bg-violet-100 dark:bg-violet-900/50 rounded-xl flex items-center justify-center mb-5">
+                    <i class="fas fa-comment-dots text-violet-600 dark:text-violet-400 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">Contact Form</h3>
+                <p class="text-gray-600 dark:text-gray-400">Let visitors send you messages directly from your profile page.</p>
+            </div>
+            <div class="bg-gray-50 dark:bg-gray-800 rounded-2xl p-8 hover:shadow-lg transition">
+                <div class="w-14 h-14 bg-gray-100 dark:bg-gray-700 rounded-xl flex items-center justify-center mb-5">
+                    <i class="fas fa-qrcode text-gray-600 dark:text-gray-400 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-semibold mb-3">QR Code</h3>
+                <p class="text-gray-600 dark:text-gray-400">Share your profile with a downloadable QR code for easy offline sharing.</p>
+            </div>
         </div>
     </div>
 </section>
@@ -99,6 +141,9 @@
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Basic theme</li>
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Profile page</li>
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Basic analytics</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Spotlight button</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Email signature</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> QR code sharing</li>
                     <li class="text-gray-400"><i class="fas fa-times text-red-400 mr-2"></i> DropLaunch branding</li>
                 </ul>
                 <a href="{{ route('register') }}" class="block w-full text-center py-3 px-6 border-2 border-primary-600 text-primary-600 rounded-xl font-semibold hover:bg-primary-50 dark:hover:bg-primary-900/20 transition">
@@ -117,6 +162,10 @@
                     <li><i class="fas fa-check text-green-500 mr-2"></i> All premium themes</li>
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Remove branding</li>
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Gallery & video sections</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Testimonials</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Resume / CV section</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Contact form</li>
+                    <li><i class="fas fa-check text-green-500 mr-2"></i> Hero background image</li>
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Detailed analytics</li>
                     <li><i class="fas fa-check text-green-500 mr-2"></i> Custom domain</li>
                 </ul>

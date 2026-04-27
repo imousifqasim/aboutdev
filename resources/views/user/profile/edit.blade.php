@@ -164,7 +164,7 @@
     </div>
 
     <!-- Videos (Premium) -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 mb-20 lg:mb-6">
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 mb-6">
         <div class="flex items-center justify-between mb-4">
             <h2 class="text-lg font-semibold">Videos @if(!$user->isPremium()) <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown"></i> Premium</span> @endif</h2>
         </div>
@@ -195,6 +195,231 @@
         @else
             <p class="text-gray-500 text-sm">Upgrade to Premium to embed videos on your profile.</p>
         @endif
+    </div>
+
+    <!-- Spotlight/CTA Button -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4"><i class="fas fa-star text-yellow-500 mr-2"></i>Spotlight Button</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add a prominent call-to-action button to your profile (e.g., "Hire Me", "Visit My Website").</p>
+        <form method="POST" action="{{ route('profile.spotlight') }}">
+            @csrf
+            @method('PUT')
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Button Label</label>
+                    <input type="text" name="spotlight_label" value="{{ old('spotlight_label', $user->profile->spotlight_label) }}" placeholder="e.g., Hire Me" maxlength="50"
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Button URL</label>
+                    <input type="url" name="spotlight_url" value="{{ old('spotlight_url', $user->profile->spotlight_url) }}" placeholder="https://..."
+                        class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 outline-none text-sm">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Icon</label>
+                    <select name="spotlight_icon" class="w-full px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 focus:ring-2 focus:ring-primary-500 outline-none text-sm">
+                        <option value="">None</option>
+                        <option value="briefcase" {{ ($user->profile->spotlight_icon ?? '') === 'briefcase' ? 'selected' : '' }}>Briefcase</option>
+                        <option value="globe" {{ ($user->profile->spotlight_icon ?? '') === 'globe' ? 'selected' : '' }}>Globe</option>
+                        <option value="envelope" {{ ($user->profile->spotlight_icon ?? '') === 'envelope' ? 'selected' : '' }}>Email</option>
+                        <option value="calendar" {{ ($user->profile->spotlight_icon ?? '') === 'calendar' ? 'selected' : '' }}>Calendar</option>
+                        <option value="shopping-cart" {{ ($user->profile->spotlight_icon ?? '') === 'shopping-cart' ? 'selected' : '' }}>Shop</option>
+                        <option value="download" {{ ($user->profile->spotlight_icon ?? '') === 'download' ? 'selected' : '' }}>Download</option>
+                        <option value="phone" {{ ($user->profile->spotlight_icon ?? '') === 'phone' ? 'selected' : '' }}>Phone</option>
+                        <option value="heart" {{ ($user->profile->spotlight_icon ?? '') === 'heart' ? 'selected' : '' }}>Heart</option>
+                        <option value="star" {{ ($user->profile->spotlight_icon ?? '') === 'star' ? 'selected' : '' }}>Star</option>
+                        <option value="rocket" {{ ($user->profile->spotlight_icon ?? '') === 'rocket' ? 'selected' : '' }}>Rocket</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="mt-4 bg-gray-800 dark:bg-gray-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:opacity-90 transition">
+                Save Spotlight
+            </button>
+        </form>
+    </div>
+
+    <!-- Background Image (Premium) -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4">Background Image @if(!$user->isPremium()) <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown"></i> Premium</span> @endif</h2>
+        @if($user->isPremium())
+            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Add a full-page hero background image to your public profile (about.me style).</p>
+            @if($user->profile->background_image)
+                <div class="relative mb-4">
+                    <img src="{{ Storage::url($user->profile->background_image) }}" alt="" class="w-full h-40 object-cover rounded-lg">
+                    <form method="POST" action="{{ route('profile.background.remove') }}" class="absolute top-2 right-2">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="bg-red-500 text-white w-8 h-8 rounded-full text-sm hover:bg-red-600"><i class="fas fa-times"></i></button>
+                    </form>
+                </div>
+            @endif
+            <form method="POST" action="{{ route('profile.background') }}" enctype="multipart/form-data" class="flex items-center gap-3">
+                @csrf
+                <input type="file" name="background_image" accept="image/*" required class="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-50 file:text-primary-700">
+                <button type="submit" class="bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">Upload</button>
+            </form>
+        @else
+            <p class="text-gray-500 text-sm">Upgrade to Premium to add a full-page hero background.</p>
+        @endif
+    </div>
+
+    <!-- Testimonials (Premium) -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4">Testimonials @if(!$user->isPremium()) <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown"></i> Premium</span> @endif</h2>
+        @if($user->isPremium())
+            @if($user->profile->testimonials && count($user->profile->testimonials) > 0)
+                <div class="space-y-3 mb-4">
+                    @foreach($user->profile->testimonials as $index => $testimonial)
+                        <div class="flex items-start justify-between p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div>
+                                <p class="text-sm italic text-gray-600 dark:text-gray-300">"{{ $testimonial['text'] }}"</p>
+                                <p class="text-sm font-semibold mt-2">{{ $testimonial['name'] }}</p>
+                                @if(!empty($testimonial['role']))
+                                    <p class="text-xs text-gray-500">{{ $testimonial['role'] }}</p>
+                                @endif
+                            </div>
+                            <form method="POST" action="{{ route('profile.testimonials.remove', $index) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="text-red-500 hover:text-red-700 text-sm ml-3"><i class="fas fa-trash"></i></button>
+                            </form>
+                        </div>
+                    @endforeach
+                </div>
+            @endif
+            <form method="POST" action="{{ route('profile.testimonials') }}" class="space-y-3">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" name="testimonial_name" placeholder="Person's name" required class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm outline-none">
+                    <input type="text" name="testimonial_role" placeholder="Role / Company (optional)" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm outline-none">
+                </div>
+                <textarea name="testimonial_text" placeholder="What did they say about you?" required maxlength="500" rows="2"
+                    class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-sm outline-none"></textarea>
+                <button type="submit" class="bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">Add Testimonial</button>
+            </form>
+        @else
+            <p class="text-gray-500 text-sm">Upgrade to Premium to add testimonials to your profile.</p>
+        @endif
+    </div>
+
+    <!-- Resume / CV (Premium) -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 mb-6">
+        <h2 class="text-lg font-semibold mb-4">Resume / CV @if(!$user->isPremium()) <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown"></i> Premium</span> @endif</h2>
+        @if($user->isPremium())
+            @php $resume = $user->profile->resume ?? ['education' => [], 'experience' => [], 'skills' => []]; @endphp
+
+            <!-- Experience -->
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 mt-4"><i class="fas fa-briefcase mr-1"></i> Experience</h3>
+            @foreach($resume['experience'] ?? [] as $index => $item)
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg mb-2">
+                    <div>
+                        <p class="text-sm font-medium">{{ $item['title'] }}</p>
+                        <p class="text-xs text-gray-500">{{ $item['subtitle'] ?? '' }} {{ !empty($item['period']) ? '| ' . $item['period'] : '' }}</p>
+                    </div>
+                    <form method="POST" action="{{ route('profile.resume.remove', ['type' => 'experience', 'index' => $index]) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-500 hover:text-red-700 text-sm"><i class="fas fa-trash"></i></button>
+                    </form>
+                </div>
+            @endforeach
+
+            <!-- Education -->
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 mt-4"><i class="fas fa-graduation-cap mr-1"></i> Education</h3>
+            @foreach($resume['education'] ?? [] as $index => $item)
+                <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg mb-2">
+                    <div>
+                        <p class="text-sm font-medium">{{ $item['title'] }}</p>
+                        <p class="text-xs text-gray-500">{{ $item['subtitle'] ?? '' }} {{ !empty($item['period']) ? '| ' . $item['period'] : '' }}</p>
+                    </div>
+                    <form method="POST" action="{{ route('profile.resume.remove', ['type' => 'education', 'index' => $index]) }}">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="text-red-500 hover:text-red-700 text-sm"><i class="fas fa-trash"></i></button>
+                    </form>
+                </div>
+            @endforeach
+
+            <!-- Skills -->
+            <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 mt-4"><i class="fas fa-code mr-1"></i> Skills</h3>
+            <div class="flex flex-wrap gap-2 mb-4">
+                @foreach($resume['skills'] ?? [] as $index => $item)
+                    <span class="inline-flex items-center gap-1 bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded-full text-sm">
+                        {{ $item['title'] }}
+                        <form method="POST" action="{{ route('profile.resume.remove', ['type' => 'skill', 'index' => $index]) }}" class="inline">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="text-red-400 hover:text-red-600 ml-1"><i class="fas fa-times text-xs"></i></button>
+                        </form>
+                    </span>
+                @endforeach
+            </div>
+
+            <!-- Add Resume Item -->
+            <form method="POST" action="{{ route('profile.resume') }}" class="space-y-3 mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg" x-data="{ type: 'experience' }">
+                @csrf
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <div>
+                        <select name="resume_type" x-model="type" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm outline-none">
+                            <option value="experience">Experience</option>
+                            <option value="education">Education</option>
+                            <option value="skill">Skill</option>
+                        </select>
+                    </div>
+                    <div>
+                        <input type="text" name="resume_title" required placeholder="Title / Skill name" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm outline-none">
+                    </div>
+                </div>
+                <div x-show="type !== 'skill'" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    <input type="text" name="resume_subtitle" placeholder="Company / Institution" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm outline-none">
+                    <input type="text" name="resume_period" placeholder="Period (e.g., 2020 - Present)" class="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm outline-none">
+                </div>
+                <div x-show="type !== 'skill'">
+                    <textarea name="resume_description" placeholder="Description (optional)" rows="2" class="w-full px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm outline-none"></textarea>
+                </div>
+                <button type="submit" class="bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm">Add Item</button>
+            </form>
+        @else
+            <p class="text-gray-500 text-sm">Upgrade to Premium to add your resume/CV to your profile.</p>
+        @endif
+    </div>
+
+    <!-- Contact Form Toggle (Premium) -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 mb-6">
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-semibold">Contact Form @if(!$user->isPremium()) <span class="text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown"></i> Premium</span> @endif</h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Let visitors send you messages directly from your profile page.</p>
+            </div>
+            @if($user->isPremium())
+                <form method="POST" action="{{ route('profile.contact-form') }}">
+                    @csrf
+                    @method('PATCH')
+                    <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition {{ $user->profile->contact_form_enabled ? 'bg-green-100 text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400' : 'bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400' }}">
+                        <i class="fas fa-{{ $user->profile->contact_form_enabled ? 'toggle-on' : 'toggle-off' }} mr-1"></i>
+                        {{ $user->profile->contact_form_enabled ? 'Enabled' : 'Disabled' }}
+                    </button>
+                </form>
+            @endif
+        </div>
+    </div>
+
+    <!-- QR Code -->
+    <div class="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 mt-6 mb-20 lg:mb-6">
+        <h2 class="text-lg font-semibold mb-4"><i class="fas fa-qrcode mr-2"></i>QR Code</h2>
+        <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Share your profile with a QR code. Anyone can scan it to visit your page.</p>
+        <div class="flex flex-col sm:flex-row items-center gap-6">
+            <div class="bg-white p-4 rounded-lg border border-gray-200">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data={{ urlencode(url('/' . $user->profile->username)) }}" alt="QR Code" class="w-48 h-48">
+            </div>
+            <div>
+                <p class="text-sm text-gray-600 dark:text-gray-400 mb-3">Your profile URL:</p>
+                <p class="text-sm font-mono bg-gray-50 dark:bg-gray-700 px-4 py-2 rounded-lg">{{ url('/' . $user->profile->username) }}</p>
+                <a href="https://api.qrserver.com/v1/create-qr-code/?size=400x400&format=png&data={{ urlencode(url('/' . $user->profile->username)) }}" download="droplaunch-qr.png" class="inline-block mt-3 bg-gray-800 dark:bg-gray-600 text-white px-4 py-2 rounded-lg text-sm hover:opacity-90 transition">
+                    <i class="fas fa-download mr-1"></i> Download QR
+                </a>
+            </div>
+        </div>
     </div>
 </div>
 @endsection

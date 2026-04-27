@@ -28,14 +28,26 @@ class Profile extends Model
         'og_image',
         'show_branding',
         'custom_domain',
+        'spotlight_label',
+        'spotlight_url',
+        'spotlight_icon',
+        'testimonials',
+        'resume',
+        'contact_form_enabled',
+        'background_image',
+        'email_signature_enabled',
     ];
 
     protected $casts = [
         'social_links' => 'array',
         'gallery' => 'array',
         'videos' => 'array',
+        'testimonials' => 'array',
+        'resume' => 'array',
         'is_premium' => 'boolean',
         'show_branding' => 'boolean',
+        'contact_form_enabled' => 'boolean',
+        'email_signature_enabled' => 'boolean',
     ];
 
     public function user(): BelongsTo
