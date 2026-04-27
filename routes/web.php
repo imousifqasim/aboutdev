@@ -45,7 +45,7 @@ Route::middleware('auth')->group(function () {
 Route::post('/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
 
 // User Dashboard Routes
-Route::middleware(['auth', 'check.banned'])->prefix('dashboard')->group(function () {
+Route::middleware(['auth', 'verified', 'check.banned'])->prefix('dashboard')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     // Profile

@@ -45,6 +45,10 @@ class UserController extends Controller
 
     public function toggleBan(User $user): RedirectResponse
     {
+        if ($user->isAdmin()) {
+            return back()->with('error', 'Cannot ban an admin user.');
+        }
+
         $user->update(['is_banned' => !$user->is_banned]);
         $status = $user->is_banned ? 'banned' : 'unbanned';
         return back()->with('success', "User has been {$status}.");
@@ -52,6 +56,10 @@ class UserController extends Controller
 
     public function destroy(User $user): RedirectResponse
     {
+        if ($user->isAdmin()) {
+            return back()->with('error', 'Cannot delete an admin user.');
+        }
+
         $user->delete();
         return redirect()->route('admin.users.index')->with('success', 'User deleted successfully.');
     }

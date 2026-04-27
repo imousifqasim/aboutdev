@@ -52,7 +52,10 @@ class ProfileController extends Controller
         $platforms = ['twitter', 'instagram', 'facebook', 'linkedin', 'github', 'youtube', 'tiktok'];
         foreach ($platforms as $platform) {
             if ($request->filled("social_{$platform}")) {
-                $socialLinks[$platform] = $request->input("social_{$platform}");
+                $url = $request->input("social_{$platform}");
+                if (filter_var($url, FILTER_VALIDATE_URL) && in_array(parse_url($url, PHP_URL_SCHEME), ['http', 'https'])) {
+                    $socialLinks[$platform] = $url;
+                }
             }
         }
         $data['social_links'] = $socialLinks;
