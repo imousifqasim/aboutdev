@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Payment;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class PaymentController extends Controller
@@ -43,13 +44,6 @@ class PaymentController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $user = $request->user();
-
-        $pendingPayment = $user->payments()->where('status', 'pending')->first();
-        if ($pendingPayment) {
-            return back()->with('error', 'You already have a pending payment. Please wait for it to be reviewed.');
-        }
-
         $request->validate([
             'method' => ['required', 'string', 'in:binance,jazzcash,raast,meezan_bank'],
             'amount' => ['required', 'numeric', 'min:1'],
@@ -59,15 +53,24 @@ class PaymentController extends Controller
 
         $screenshotPath = $request->file('screenshot')->store('payment-screenshots', 'public');
 
-        Payment::create([
-            'user_id' => $user->id,
-            'method' => $request->method,
-            'amount' => $request->amount,
-            'transaction_id' => $request->transaction_id,
-            'screenshot_path' => $screenshotPath,
-            'status' => 'pending',
-        ]);
+        return DB::transaction(function () use ($request, $screenshotPath) {
+            $user = $request->user();
 
-        return back()->with('success', 'Payment submitted successfully! It will be reviewed shortly.');
+            $pendingPayment = $user->payments()->lockForUpdate()->where('status', 'pending')->first();
+            if ($pendingPayment) {
+                return back()->with('error', 'You already have a pending payment. Please wait for it to be reviewed.');
+            }
+
+            Payment::create([
+                'user_id' => $user->id,
+                'method' => $request->method,
+                'amount' => $request->amount,
+                'transaction_id' => $request->transaction_id,
+                'screenshot_path' => $screenshotPath,
+                'status' => 'pending',
+            ]);
+
+            return back()->with('success', 'Payment submitted successfully! It will be reviewed shortly.');
+        });
     }
 }

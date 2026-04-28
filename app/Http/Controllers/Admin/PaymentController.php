@@ -36,7 +36,7 @@ class PaymentController extends Controller
         return DB::transaction(function () use ($request, $payment) {
             $payment = Payment::lockForUpdate()->find($payment->id);
 
-            if ($payment->status !== 'pending') {
+            if (!$payment || $payment->status !== 'pending') {
                 return back()->with('error', 'This payment has already been reviewed.');
             }
 
@@ -74,7 +74,7 @@ class PaymentController extends Controller
         return DB::transaction(function () use ($request, $payment) {
             $payment = Payment::lockForUpdate()->find($payment->id);
 
-            if ($payment->status !== 'pending') {
+            if (!$payment || $payment->status !== 'pending') {
                 return back()->with('error', 'This payment has already been reviewed.');
             }
 
