@@ -79,6 +79,6 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isPremium(): bool
     {
-        return $this->profile && $this->profile->is_premium;
+        return $this->activeSubscription !== null;
     }
 }

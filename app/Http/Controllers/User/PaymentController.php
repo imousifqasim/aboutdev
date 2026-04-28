@@ -51,15 +51,17 @@ class PaymentController extends Controller
             'screenshot' => ['required', 'image', 'mimes:jpeg,png,jpg,gif', 'max:5120'],
         ]);
 
-        $screenshotPath = $request->file('screenshot')->store('payment-screenshots', 'public');
+        $screenshotFile = $request->file('screenshot');
 
-        return DB::transaction(function () use ($request, $screenshotPath) {
+        return DB::transaction(function () use ($request, $screenshotFile) {
             $user = $request->user();
 
             $pendingPayment = $user->payments()->lockForUpdate()->where('status', 'pending')->first();
             if ($pendingPayment) {
                 return back()->with('error', 'You already have a pending payment. Please wait for it to be reviewed.');
             }
+
+            $screenshotPath = $screenshotFile->store('payment-screenshots', 'public');
 
             Payment::create([
                 'user_id' => $user->id,
