@@ -23,12 +23,18 @@ exports.login = async (req, res) => {
     return res.redirect('/login');
   }
 
-  req.session.userId = user.id;
-  req.session.save(() => {
-    if (user.role === 'admin') {
-      return res.redirect('/admin');
+  req.session.regenerate((err) => {
+    if (err) {
+      req.flash('error', 'Login failed. Please try again.');
+      return res.redirect('/login');
     }
-    res.redirect('/dashboard');
+    req.session.userId = user.id;
+    req.session.save(() => {
+      if (user.role === 'admin') {
+        return res.redirect('/admin');
+      }
+      res.redirect('/dashboard');
+    });
   });
 };
 

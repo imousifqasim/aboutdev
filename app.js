@@ -61,7 +61,7 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   console.error('Error:', err.message);
   console.error(err.stack);
-  res.status(500).render('layouts/error', { title: '500', message: err.message || 'Something went wrong.' });
+  res.status(500).render('layouts/error', { title: '500', message: process.env.NODE_ENV === 'production' ? 'Something went wrong.' : (err.message || 'Something went wrong.') });
 });
 
 const PORT = process.env.PORT || 8000;

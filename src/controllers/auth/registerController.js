@@ -64,8 +64,14 @@ exports.register = async (req, res) => {
     },
   });
 
-  req.session.userId = user.id;
-  req.session.save(() => {
-    res.redirect('/dashboard');
+  req.session.regenerate((err) => {
+    if (err) {
+      req.flash('error', 'Registration succeeded but login failed. Please log in manually.');
+      return res.redirect('/login');
+    }
+    req.session.userId = user.id;
+    req.session.save(() => {
+      res.redirect('/dashboard');
+    });
   });
 };

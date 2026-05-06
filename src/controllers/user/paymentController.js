@@ -1,5 +1,12 @@
+const fs = require('fs');
 const prisma = require('../../prisma');
 const { isPremium } = require('../../helpers');
+
+function cleanupFile(req) {
+  if (req.file && req.file.path) {
+    fs.unlink(req.file.path, () => {});
+  }
+}
 
 const PAYMENT_METHODS = [
   { name: 'Binance (USDT)', value: 'binance', details: 'UID: 827969859' },
@@ -36,6 +43,7 @@ exports.store = async (req, res) => {
   const validMethods = PAYMENT_METHODS.map(m => m.value);
 
   if (!method || !validMethods.includes(method) || !amount || !transaction_id) {
+    cleanupFile(req);
     req.flash('error', 'All fields are required.');
     return res.redirect('/dashboard/payments');
   }
@@ -47,6 +55,7 @@ exports.store = async (req, res) => {
 
   const existingTx = await prisma.payment.findUnique({ where: { transactionId: transaction_id } });
   if (existingTx) {
+    cleanupFile(req);
     req.flash('error', 'This transaction ID has already been used.');
     return res.redirect('/dashboard/payments');
   }
@@ -55,6 +64,7 @@ exports.store = async (req, res) => {
     where: { userId: req.user.id, status: 'pending' },
   });
   if (pendingPayment) {
+    cleanupFile(req);
     req.flash('error', 'You already have a pending payment. Please wait for it to be reviewed.');
     return res.redirect('/dashboard/payments');
   }

@@ -33,52 +33,61 @@ exports.show = async (req, res) => {
 
 exports.approve = async (req, res) => {
   const paymentId = parseInt(req.params.id);
-  const payment = await prisma.payment.findUnique({
-    where: { id: paymentId },
-    include: { user: { include: { profile: true } } },
-  });
 
-  if (!payment || payment.status !== 'pending') {
-    req.flash('error', 'This payment has already been reviewed.');
-    return res.redirect(`/admin/payments/${paymentId}`);
+  try {
+    await prisma.$transaction(async (tx) => {
+      const payment = await tx.payment.findUnique({
+        where: { id: paymentId },
+        include: { user: { include: { profile: true } } },
+      });
+
+      if (!payment || payment.status !== 'pending') {
+        throw new Error('already-reviewed');
+      }
+
+      await tx.payment.update({
+        where: { id: paymentId },
+        data: {
+          status: 'approved',
+          adminNote: req.body.admin_note || null,
+          reviewedBy: req.user.id,
+          reviewedAt: new Date(),
+        },
+      });
+
+      await tx.profile.update({
+        where: { id: payment.user.profile.id },
+        data: { isPremium: true, showBranding: false },
+      });
+
+      await tx.subscription.updateMany({
+        where: { userId: payment.userId, isActive: true },
+        data: { isActive: false },
+      });
+
+      const endDate = new Date();
+      endDate.setFullYear(endDate.getFullYear() + 1);
+
+      await tx.subscription.create({
+        data: {
+          userId: payment.userId,
+          plan: 'premium',
+          startDate: new Date(),
+          endDate,
+          isActive: true,
+        },
+      });
+    });
+
+    req.flash('success', 'Payment approved. User upgraded to Premium!');
+  } catch (err) {
+    if (err.message === 'already-reviewed') {
+      req.flash('error', 'This payment has already been reviewed.');
+    } else {
+      throw err;
+    }
   }
 
-  await prisma.$transaction(async (tx) => {
-    await tx.payment.update({
-      where: { id: paymentId },
-      data: {
-        status: 'approved',
-        adminNote: req.body.admin_note || null,
-        reviewedBy: req.user.id,
-        reviewedAt: new Date(),
-      },
-    });
-
-    await tx.profile.update({
-      where: { id: payment.user.profile.id },
-      data: { isPremium: true, showBranding: false },
-    });
-
-    await tx.subscription.updateMany({
-      where: { userId: payment.userId, isActive: true },
-      data: { isActive: false },
-    });
-
-    const endDate = new Date();
-    endDate.setFullYear(endDate.getFullYear() + 1);
-
-    await tx.subscription.create({
-      data: {
-        userId: payment.userId,
-        plan: 'premium',
-        startDate: new Date(),
-        endDate,
-        isActive: true,
-      },
-    });
-  });
-
-  req.flash('success', 'Payment approved. User upgraded to Premium!');
   res.redirect(`/admin/payments/${paymentId}`);
 };
 
@@ -91,22 +100,32 @@ exports.reject = async (req, res) => {
     return res.redirect(`/admin/payments/${paymentId}`);
   }
 
-  const payment = await prisma.payment.findUnique({ where: { id: paymentId } });
-  if (!payment || payment.status !== 'pending') {
-    req.flash('error', 'This payment has already been reviewed.');
-    return res.redirect(`/admin/payments/${paymentId}`);
+  try {
+    await prisma.$transaction(async (tx) => {
+      const payment = await tx.payment.findUnique({ where: { id: paymentId } });
+      if (!payment || payment.status !== 'pending') {
+        throw new Error('already-reviewed');
+      }
+
+      await tx.payment.update({
+        where: { id: paymentId },
+        data: {
+          status: 'rejected',
+          adminNote: admin_note,
+          reviewedBy: req.user.id,
+          reviewedAt: new Date(),
+        },
+      });
+    });
+
+    req.flash('success', 'Payment rejected.');
+  } catch (err) {
+    if (err.message === 'already-reviewed') {
+      req.flash('error', 'This payment has already been reviewed.');
+    } else {
+      throw err;
+    }
   }
 
-  await prisma.payment.update({
-    where: { id: paymentId },
-    data: {
-      status: 'rejected',
-      adminNote: admin_note,
-      reviewedBy: req.user.id,
-      reviewedAt: new Date(),
-    },
-  });
-
-  req.flash('success', 'Payment rejected.');
   res.redirect(`/admin/payments/${paymentId}`);
 };
