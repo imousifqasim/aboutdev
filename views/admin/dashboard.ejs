@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<head><%- include('../layouts/partials/head') %><title>Admin Dashboard - <%= appName %></title></head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+<div class="flex h-screen overflow-hidden">
+    <%- include('../layouts/partials/admin-sidebar') %>
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <%- include('../layouts/partials/dashboard-header', { title: 'Admin Dashboard' }) %>
+        <main class="flex-1 overflow-y-auto p-6">
+            <%- include('../layouts/partials/flash') %>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between"><div><p class="text-sm text-gray-500">Total Users</p><p class="text-3xl font-bold"><%= totalUsers %></p></div><div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center"><i class="fas fa-users text-blue-600 text-xl"></i></div></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between"><div><p class="text-sm text-gray-500">Premium Users</p><p class="text-3xl font-bold"><%= premiumUsers %></p></div><div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900 rounded-lg flex items-center justify-center"><i class="fas fa-crown text-yellow-600 text-xl"></i></div></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between"><div><p class="text-sm text-gray-500">Pending Payments</p><p class="text-3xl font-bold"><%= pendingPayments %></p></div><div class="w-12 h-12 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center"><i class="fas fa-clock text-orange-600 text-xl"></i></div></div>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between"><div><p class="text-sm text-gray-500">Total Revenue</p><p class="text-3xl font-bold">$<%= totalRevenue.toFixed(2) %></p></div><div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center"><i class="fas fa-dollar-sign text-green-600 text-xl"></i></div></div>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold mb-4">User Growth (Last 6 Months)</h3>
+                    <canvas id="userGrowthChart" height="200"></canvas>
+                </div>
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold mb-4">Recent Payments</h3>
+                    <% if (recentPayments.length === 0) { %><p class="text-gray-500">No payments yet.</p><% } else { %>
+                    <div class="space-y-3">
+                        <% recentPayments.forEach(function(p) { %>
+                        <div class="flex items-center justify-between p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                            <div><p class="font-medium"><%= p.user.name %></p><p class="text-sm text-gray-500"><%= p.method %> - $<%= parseFloat(p.amount).toFixed(2) %></p></div>
+                            <span class="px-2 py-1 text-xs rounded-full font-medium <%= p.status === 'approved' ? 'bg-green-100 text-green-800' : p.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' %>"><%= p.status %></span>
+                        </div>
+                        <% }) %>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+const chartData = <%- JSON.stringify(monthlyUsers) %>;
+const ctx = document.getElementById('userGrowthChart');
+if (ctx) {
+    new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: { labels: chartData.map(d => d.month), datasets: [{ label: 'New Users', data: chartData.map(d => d.count), backgroundColor: 'rgba(99,102,241,0.5)', borderColor: '#6366f1', borderWidth: 1 }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+}
+</script>
+</body>
+</html>

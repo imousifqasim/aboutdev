@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - <%= appName %></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwindcss.config = { darkMode: 'class' }</script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+    <div class="flex h-screen overflow-hidden">
+        <%- include('../layouts/partials/user-sidebar') %>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <%- include('../layouts/partials/dashboard-header', { title: 'Dashboard' }) %>
+            <main class="flex-1 overflow-y-auto p-6">
+                <%- include('../layouts/partials/flash') %>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div><p class="text-sm text-gray-500 dark:text-gray-400">Profile Views</p><p class="text-3xl font-bold mt-1"><%= totalViews %></p></div>
+                            <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center"><i class="fas fa-eye text-blue-600 dark:text-blue-400 text-xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div><p class="text-sm text-gray-500 dark:text-gray-400">Link Clicks</p><p class="text-3xl font-bold mt-1"><%= totalClicks %></p></div>
+                            <div class="w-12 h-12 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center"><i class="fas fa-mouse-pointer text-green-600 dark:text-green-400 text-xl"></i></div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div><p class="text-sm text-gray-500 dark:text-gray-400">Total Links</p><p class="text-3xl font-bold mt-1"><%= totalLinks %></p></div>
+                            <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center"><i class="fas fa-link text-purple-600 dark:text-purple-400 text-xl"></i></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="font-semibold mb-4">Profile Overview</h3>
+                        <div class="flex items-center space-x-4">
+                            <div class="w-16 h-16 rounded-full bg-indigo-100 dark:bg-indigo-900 flex items-center justify-center">
+                                <span class="text-2xl font-bold text-indigo-600 dark:text-indigo-400"><%= user.name.charAt(0) %></span>
+                            </div>
+                            <div>
+                                <p class="font-semibold"><%= user.name %></p>
+                                <p class="text-sm text-gray-500">@<%= user.profile ? user.profile.username : '' %></p>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium mt-1 <%= user.isPremiumUser ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100 text-gray-800' %>">
+                                    <% if (user.isPremiumUser) { %><i class="fas fa-crown mr-1"></i>Premium<% } else { %>Free Plan<% } %>
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="font-semibold mb-4">Analytics (Last 30 Days)</h3>
+                        <canvas id="analyticsChart" height="150"></canvas>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script>
+    const chartData = <%- JSON.stringify(chartData) %>;
+    const ctx = document.getElementById('analyticsChart');
+    if (ctx) {
+        new Chart(ctx.getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: chartData.map(d => d.date),
+                datasets: [
+                    { label: 'Views', data: chartData.map(d => d.views), borderColor: '#6366f1', backgroundColor: 'rgba(99,102,241,0.1)', fill: true, tension: 0.4 },
+                    { label: 'Clicks', data: chartData.map(d => d.clicks), borderColor: '#22c55e', backgroundColor: 'rgba(34,197,94,0.1)', fill: true, tension: 0.4 },
+                ],
+            },
+            options: { responsive: true, plugins: { legend: { position: 'bottom' } }, scales: { x: { display: false }, y: { beginAtZero: true } } },
+        });
+    }
+    </script>
+</body>
+</html>

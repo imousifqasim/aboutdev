@@ -1,0 +1,161 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               Int              @id @default(autoincrement())
+  name             String
+  email            String           @unique
+  password         String
+  role             String           @default("user")
+  isBanned         Boolean          @default(false) @map("is_banned")
+  emailVerifiedAt  DateTime?        @map("email_verified_at")
+  rememberToken    String?          @map("remember_token")
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+
+  profile          Profile?
+  links            Link[]
+  payments         Payment[]        @relation("UserPayments")
+  reviewedPayments Payment[]        @relation("ReviewerPayments")
+  subscriptions    Subscription[]
+  analytics        Analytic[]
+  contactMessages  ContactMessage[]
+
+  @@map("users")
+}
+
+model Profile {
+  id                    Int      @id @default(autoincrement())
+  userId                Int      @unique @map("user_id")
+  username              String   @unique
+  bio                   String?  @db.Text
+  image                 String?
+  theme                 String   @default("default")
+  isPremium             Boolean  @default(false) @map("is_premium")
+  location              String?
+  company               String?
+  website               String?
+  socialLinks           Json?    @map("social_links")
+  gallery               Json?
+  videos                Json?
+  metaTitle             String?  @map("meta_title")
+  metaDescription       String?  @map("meta_description") @db.Text
+  ogImage               String?  @map("og_image")
+  showBranding          Boolean  @default(true) @map("show_branding")
+  customDomain          String?  @map("custom_domain")
+  spotlightLabel        String?  @map("spotlight_label")
+  spotlightUrl          String?  @map("spotlight_url")
+  spotlightIcon         String?  @map("spotlight_icon")
+  testimonials          Json?
+  resume                Json?
+  contactFormEnabled    Boolean  @default(false) @map("contact_form_enabled")
+  backgroundImage       String?  @map("background_image")
+  emailSignatureEnabled Boolean  @default(true) @map("email_signature_enabled")
+  createdAt             DateTime @default(now()) @map("created_at")
+  updatedAt             DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("profiles")
+}
+
+model Link {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  title     String
+  url       String   @db.VarChar(500)
+  icon      String?
+  position  Int      @default(0)
+  isActive  Boolean  @default(true) @map("is_active")
+  clicks    Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("links")
+}
+
+model Payment {
+  id             Int       @id @default(autoincrement())
+  userId         Int       @map("user_id")
+  method         String
+  amount         Decimal   @db.Decimal(10, 2)
+  transactionId  String    @unique @map("transaction_id")
+  screenshotPath String?   @map("screenshot_path")
+  status         String    @default("pending")
+  adminNote      String?   @map("admin_note") @db.Text
+  reviewedBy     Int?      @map("reviewed_by")
+  reviewedAt     DateTime? @map("reviewed_at")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  user     User  @relation("UserPayments", fields: [userId], references: [id], onDelete: Cascade)
+  reviewer User? @relation("ReviewerPayments", fields: [reviewedBy], references: [id])
+
+  @@map("payments")
+}
+
+model Subscription {
+  id        Int       @id @default(autoincrement())
+  userId    Int       @map("user_id")
+  plan      String    @default("free")
+  startDate DateTime  @map("start_date")
+  endDate   DateTime? @map("end_date")
+  isActive  Boolean   @default(true) @map("is_active")
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("subscriptions")
+}
+
+model Analytic {
+  id           Int      @id @default(autoincrement())
+  userId       Int      @map("user_id")
+  profileViews Int      @default(0) @map("profile_views")
+  linkClicks   Int      @default(0) @map("link_clicks")
+  date         DateTime @db.Date
+  referrer     String?
+  country      String?
+  device       String?
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date])
+  @@map("analytics")
+}
+
+model ContactMessage {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  senderName  String   @map("sender_name")
+  senderEmail String   @map("sender_email")
+  message     String   @db.Text
+  isRead      Boolean  @default(false) @map("is_read")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("contact_messages")
+}
+
+model SiteSetting {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique
+  value     String?  @db.Text
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("site_settings")
+}

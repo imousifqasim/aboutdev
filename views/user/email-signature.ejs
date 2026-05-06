@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<head><%- include('../layouts/partials/head') %><title>Email Signature - <%= appName %></title></head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+<div class="flex h-screen overflow-hidden">
+    <%- include('../layouts/partials/user-sidebar') %>
+    <div class="flex-1 flex flex-col overflow-hidden">
+        <%- include('../layouts/partials/dashboard-header', { title: 'Email Signature' }) %>
+        <main class="flex-1 overflow-y-auto p-6">
+            <%- include('../layouts/partials/flash') %>
+            <div class="max-w-4xl">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-envelope mr-2"></i>Email Signature Generator</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Copy the signature below and paste it into your email client settings.</p>
+                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-4" id="signature-preview">
+                        <table cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif;">
+                            <tr>
+                                <td style="padding-right: 15px; border-right: 2px solid #6366f1;">
+                                    <div style="width: 60px; height: 60px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; text-align: center; line-height: 60px;"><%= user.name.charAt(0) %></div>
+                                </td>
+                                <td style="padding-left: 15px;">
+                                    <p style="margin: 0; font-weight: bold; font-size: 16px; color: #1f2937;"><%= user.name %></p>
+                                    <% if (user.profile && user.profile.bio) { %><p style="margin: 2px 0 0; font-size: 12px; color: #6b7280;"><%= user.profile.bio.substring(0, 60) %></p><% } %>
+                                    <p style="margin: 8px 0 0;"><a href="<%= appUrl %>/<%= user.profile ? user.profile.username : '' %>" style="color: #6366f1; text-decoration: none; font-size: 12px;">droplaunch.dev/<%= user.profile ? user.profile.username : '' %></a></p>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                    <button onclick="copySignature()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-copy mr-2"></i>Copy Signature HTML</button>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+<script>
+function copySignature() {
+    const el = document.getElementById('signature-preview');
+    const range = document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    alert('Signature copied!');
+}
+</script>
+</body>
+</html>

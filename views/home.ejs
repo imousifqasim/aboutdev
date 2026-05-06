@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <meta name="description" content="Create your personal portfolio page and share your links with the world.">
+    <meta property="og:title" content="<%= appName %> - Create Your Personal Portfolio Page">
+    <meta property="og:description" content="Build your portfolio, share your links, showcase your work.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwindcss.config = { darkMode: 'class' }</script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+    <%- include('layouts/navigation') %>
+
+    <!-- Hero Section -->
+    <section class="relative overflow-hidden">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+            <div class="text-center">
+                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight">
+                    Your <span class="text-indigo-600 dark:text-indigo-400">Personal Portfolio</span><br>
+                    One Link Away
+                </h1>
+                <p class="mt-6 text-lg sm:text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
+                    Create a beautiful portfolio page, share your links, showcase your work, and grow your audience. All in one place.
+                </p>
+                <div class="mt-10 flex flex-col sm:flex-row gap-4 justify-center">
+                    <a href="/register" class="px-8 py-3 bg-indigo-600 text-white text-lg font-semibold rounded-lg hover:bg-indigo-700 transition shadow-lg">
+                        Get Started Free <i class="fas fa-arrow-right ml-2"></i>
+                    </a>
+                    <a href="/tousif" class="px-8 py-3 bg-white dark:bg-gray-800 text-indigo-600 dark:text-indigo-400 text-lg font-semibold rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition border border-gray-200 dark:border-gray-600">
+                        See Demo <i class="fas fa-eye ml-2"></i>
+                    </a>
+                </div>
+                <p class="mt-4 text-sm text-gray-500 dark:text-gray-400">
+                    <i class="fas fa-link mr-1"></i> droplaunch.dev/username
+                </p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="py-20 bg-white dark:bg-gray-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold">Everything You Need</h2>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">Powerful features to build your online presence</p>
+            </div>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+                <% const features = [
+                    { icon: 'fa-user', title: 'Custom Profile', desc: 'Personalized portfolio page with your own URL' },
+                    { icon: 'fa-link', title: 'Link Management', desc: 'Add, organize, and track all your important links' },
+                    { icon: 'fa-palette', title: '8 Themes', desc: 'Choose from 8 beautiful themes to match your style' },
+                    { icon: 'fa-chart-line', title: 'Analytics', desc: 'Track profile views and link clicks with charts' },
+                    { icon: 'fa-star', title: 'Spotlight CTA', desc: 'Prominent call-to-action button on your profile' },
+                    { icon: 'fa-envelope', title: 'Email Signature', desc: 'Generate professional email signatures' },
+                    { icon: 'fa-qrcode', title: 'QR Code', desc: 'Shareable QR code for your profile' },
+                    { icon: 'fa-grip-lines', title: 'Drag & Drop', desc: 'Reorder links with drag and drop' },
+                    { icon: 'fa-address-card', title: 'Contact Form', desc: 'Let visitors send you messages directly' },
+                    { icon: 'fa-quote-left', title: 'Testimonials', desc: 'Showcase endorsements from clients' },
+                    { icon: 'fa-file-alt', title: 'Resume/CV', desc: 'Display your education and experience' },
+                    { icon: 'fa-image', title: 'Hero Background', desc: 'Full-page background image on your profile' },
+                ]; features.forEach(f => { %>
+                <div class="p-6 bg-gray-50 dark:bg-gray-700 rounded-xl hover:shadow-lg transition">
+                    <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900 rounded-lg flex items-center justify-center mb-4">
+                        <i class="fas <%= f.icon %> text-indigo-600 dark:text-indigo-400 text-xl"></i>
+                    </div>
+                    <h3 class="font-semibold text-lg mb-2"><%= f.title %></h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400"><%= f.desc %></p>
+                </div>
+                <% }) %>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-bold">Simple Pricing</h2>
+                <p class="mt-4 text-gray-600 dark:text-gray-400">Start free, upgrade when you need more</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                <!-- Free Plan -->
+                <div class="p-8 bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-2xl font-bold">Free</h3>
+                    <p class="mt-2 text-gray-600 dark:text-gray-400">Perfect for getting started</p>
+                    <div class="mt-6"><span class="text-4xl font-extrabold">$0</span><span class="text-gray-500">/forever</span></div>
+                    <ul class="mt-8 space-y-3 text-sm">
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Up to 5 links</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>2 Basic themes</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Basic analytics</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Spotlight CTA button</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Email signature generator</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>QR code sharing</li>
+                        <li><i class="fas fa-check text-green-500 mr-2"></i>Platform branding</li>
+                    </ul>
+                    <a href="/register" class="mt-8 block text-center py-3 px-6 bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg font-semibold hover:bg-gray-200 dark:hover:bg-gray-600 transition">Get Started</a>
+                </div>
+                <!-- Premium Plan -->
+                <div class="p-8 bg-indigo-600 text-white rounded-2xl shadow-xl relative">
+                    <div class="absolute -top-3 right-6 bg-yellow-400 text-gray-900 px-3 py-1 rounded-full text-xs font-bold">POPULAR</div>
+                    <h3 class="text-2xl font-bold">Premium</h3>
+                    <p class="mt-2 text-indigo-200">Everything you need to grow</p>
+                    <div class="mt-6"><span class="text-4xl font-extrabold">$<%= premiumPrice %></span><span class="text-indigo-200">/<%= premiumCurrency %>/year</span></div>
+                    <ul class="mt-8 space-y-3 text-sm">
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Unlimited links</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>All 8 themes</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Detailed analytics dashboard</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Contact form & messages</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Testimonials section</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Resume/CV section</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Gallery & Videos</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Hero background image</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>SEO customization</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Remove branding</li>
+                        <li><i class="fas fa-check text-yellow-400 mr-2"></i>Custom domain support</li>
+                    </ul>
+                    <a href="/register" class="mt-8 block text-center py-3 px-6 bg-white text-indigo-600 rounded-lg font-semibold hover:bg-gray-100 transition">Upgrade Now</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <%- include('layouts/footer') %>
+</body>
+</html>
