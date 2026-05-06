@@ -45,7 +45,7 @@ exports.show = async (req, res) => {
     return res.redirect('/admin/users');
   }
 
-  res.render('admin/users/show', { title: `User: ${user.name}`, user: req.user, viewUser: user });
+  res.render('admin/users/show', { title: `User: ${user.name}`, user: req.user, targetUser: user });
 };
 
 exports.toggleBan = async (req, res) => {
