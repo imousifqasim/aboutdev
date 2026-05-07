@@ -12,7 +12,7 @@ async function loadUser(req, res, next) {
       req.user = user;
       res.locals.user = user;
     } else {
-      req.session.destroy();
+      req.session.userId = null;
     }
   }
   res.locals.user = res.locals.user || null;
