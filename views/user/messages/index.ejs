@@ -34,9 +34,9 @@
                                 </div>
                                 <div class="flex space-x-2 ml-4">
                                     <% if (!m.isRead) { %>
-                                    <form method="POST" action="/dashboard/messages/<%= m.id %>/read"><button type="submit" class="px-3 py-1 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-400 rounded text-sm"><i class="fas fa-check"></i></button></form>
+                                    <form method="POST" action="/dashboard/messages/<%= m.id %>/read"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="px-3 py-1 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-400 rounded text-sm"><i class="fas fa-check"></i></button></form>
                                     <% } %>
-                                    <form method="POST" action="/dashboard/messages/<%= m.id %>/delete" onsubmit="return confirm('Delete this message?')"><button type="submit" class="px-3 py-1 bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-400 rounded text-sm"><i class="fas fa-trash"></i></button></form>
+                                    <form method="POST" action="/dashboard/messages/<%= m.id %>/delete" onsubmit="return confirm('Delete this message?')"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="px-3 py-1 bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-400 rounded text-sm"><i class="fas fa-trash"></i></button></form>
                                 </div>
                             </div>
                         </div>

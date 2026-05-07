@@ -60,26 +60,37 @@ exports.store = async (req, res) => {
     return res.redirect('/dashboard/payments');
   }
 
-  const pendingPayment = await prisma.payment.findFirst({
-    where: { userId: req.user.id, status: 'pending' },
-  });
-  if (pendingPayment) {
-    cleanupFile(req);
-    req.flash('error', 'You already have a pending payment. Please wait for it to be reviewed.');
-    return res.redirect('/dashboard/payments');
+  try {
+    await prisma.$transaction(async (tx) => {
+      const pendingPayment = await tx.payment.findFirst({
+        where: { userId: req.user.id, status: 'pending' },
+      });
+      if (pendingPayment) {
+        throw new Error('pending-exists');
+      }
+
+      await tx.payment.create({
+        data: {
+          userId: req.user.id,
+          method,
+          amount: parseFloat(amount),
+          transactionId: transaction_id,
+          screenshotPath: 'payment-screenshots/' + req.file.filename,
+          status: 'pending',
+        },
+      });
+    });
+
+    req.flash('success', 'Payment submitted successfully! It will be reviewed shortly.');
+  } catch (err) {
+    if (err.message === 'pending-exists') {
+      cleanupFile(req);
+      req.flash('error', 'You already have a pending payment. Please wait for it to be reviewed.');
+    } else {
+      cleanupFile(req);
+      throw err;
+    }
   }
 
-  await prisma.payment.create({
-    data: {
-      userId: req.user.id,
-      method,
-      amount: parseFloat(amount),
-      transactionId: transaction_id,
-      screenshotPath: 'payment-screenshots/' + req.file.filename,
-      status: 'pending',
-    },
-  });
-
-  req.flash('success', 'Payment submitted successfully! It will be reviewed shortly.');
   res.redirect('/dashboard/payments');
 };

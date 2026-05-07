@@ -5,6 +5,7 @@ const flash = require('connect-flash');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const loadUser = require('./src/middleware/loadUser');
+const csrfProtection = require('./src/middleware/csrf');
 const routes = require('./src/routes');
 const { formatDate, timeAgo, formatCurrency } = require('./src/helpers');
 
@@ -36,6 +37,9 @@ app.use(flash());
 
 // Load user from session
 app.use(loadUser);
+
+// CSRF protection
+app.use(csrfProtection);
 
 // Make flash messages and helpers available to all views
 app.use((req, res, next) => {

@@ -14,7 +14,7 @@
                     <% if (!user.isPremiumUser && links.length >= 5) { %>
                     <p class="text-sm text-amber-600 dark:text-amber-400 mb-4"><i class="fas fa-lock mr-1"></i>Free plan limit reached (5/5). <a href="/dashboard/payments" class="underline">Upgrade to Premium</a> for unlimited links.</p>
                     <% } %>
-                    <form method="POST" action="/dashboard/links" class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <form method="POST" action="/dashboard/links" class="grid grid-cols-1 md:grid-cols-4 gap-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <input type="text" name="title" placeholder="Link Title" required class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
                         <input type="url" name="url" placeholder="https://example.com" required class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
                         <select name="icon" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
@@ -45,12 +45,12 @@
                             <span class="text-sm text-gray-500 mr-4"><i class="fas fa-mouse-pointer mr-1"></i><%= link.clicks %> clicks</span>
                         </div>
                         <div class="flex items-center space-x-2">
-                            <form method="POST" action="/dashboard/links/<%= link.id %>/toggle">
+                            <form method="POST" action="/dashboard/links/<%= link.id %>/toggle"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <button type="submit" class="px-3 py-1 rounded text-sm <%= link.isActive ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400' : 'bg-gray-100 text-gray-500 dark:bg-gray-700 dark:text-gray-400' %>">
                                     <i class="fas fa-<%= link.isActive ? 'eye' : 'eye-slash' %>"></i>
                                 </button>
                             </form>
-                            <form method="POST" action="/dashboard/links/<%= link.id %>/delete" onsubmit="return confirm('Delete this link?')">
+                            <form method="POST" action="/dashboard/links/<%= link.id %>/delete" onsubmit="return confirm('Delete this link?')"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
                                 <button type="submit" class="px-3 py-1 rounded text-sm bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-400"><i class="fas fa-trash"></i></button>
                             </form>
                         </div>
