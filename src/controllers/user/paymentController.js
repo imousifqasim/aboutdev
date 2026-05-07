@@ -83,13 +83,12 @@ exports.store = async (req, res) => {
 
     req.flash('success', 'Payment submitted successfully! It will be reviewed shortly.');
   } catch (err) {
+    cleanupFile(req);
     if (err.message === 'pending-exists') {
-      cleanupFile(req);
       req.flash('error', 'You already have a pending payment. Please wait for it to be reviewed.');
-    } else {
-      cleanupFile(req);
-      throw err;
+      return res.redirect('/dashboard/payments');
     }
+    throw err;
   }
 
   res.redirect('/dashboard/payments');

@@ -3,6 +3,18 @@ const { isPremium, RESERVED_USERNAMES } = require('../../helpers');
 const path = require('path');
 const fs = require('fs');
 
+function cleanupFile(req) {
+  if (req.file && req.file.path) {
+    fs.unlink(req.file.path, () => {});
+  }
+}
+
+function cleanupFiles(req) {
+  if (req.files && req.files.length > 0) {
+    req.files.forEach(f => fs.unlink(f.path, () => {}));
+  }
+}
+
 exports.edit = async (req, res) => {
   const user = await prisma.user.findUnique({ where: { id: req.user.id }, include: { profile: true } });
   user.isPremiumUser = await isPremium(user.id);
@@ -16,11 +28,13 @@ exports.update = async (req, res) => {
   const { name, username, bio, location, company, website, meta_title, meta_description } = req.body;
 
   if (!name || !username) {
+    cleanupFile(req);
     req.flash('error', 'Name and username are required.');
     return res.redirect('/dashboard/profile');
   }
 
   if (RESERVED_USERNAMES.includes(username.toLowerCase())) {
+    cleanupFile(req);
     req.flash('error', 'This username is reserved.');
     return res.redirect('/dashboard/profile');
   }
@@ -29,6 +43,7 @@ exports.update = async (req, res) => {
     where: { username: username.toLowerCase(), NOT: { id: profile.id } },
   });
   if (existing) {
+    cleanupFile(req);
     req.flash('error', 'Username is already taken.');
     return res.redirect('/dashboard/profile');
   }
@@ -87,6 +102,7 @@ exports.updateTheme = async (req, res) => {
 
 exports.updateGallery = async (req, res) => {
   if (!req.user.isPremiumUser) {
+    cleanupFiles(req);
     req.flash('error', 'Gallery feature requires premium subscription.');
     return res.redirect('/dashboard/profile');
   }
@@ -267,6 +283,7 @@ exports.toggleContactForm = async (req, res) => {
 
 exports.updateBackground = async (req, res) => {
   if (!req.user.isPremiumUser) {
+    cleanupFile(req);
     req.flash('error', 'Background image requires premium subscription.');
     return res.redirect('/dashboard/profile');
   }
