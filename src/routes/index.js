@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 const { isAuthenticated, isGuest, isAdmin, isNotBanned } = require('../middleware/auth');
+const { csrfValidateMultipart } = require('../middleware/csrf');
 
 const homeController = require('../controllers/homeController');
 const loginController = require('../controllers/auth/loginController');
@@ -68,9 +69,9 @@ dashboardRouter.get('/', dashboardController.index);
 
 // Profile
 dashboardRouter.get('/profile', profileController.edit);
-dashboardRouter.post('/profile', setUploadType('profiles'), upload.single('image'), profileController.update);
+dashboardRouter.post('/profile', setUploadType('profiles'), upload.single('image'), csrfValidateMultipart, profileController.update);
 dashboardRouter.post('/profile/theme', profileController.updateTheme);
-dashboardRouter.post('/profile/gallery', setUploadType('gallery'), upload.array('gallery_images', 10), profileController.updateGallery);
+dashboardRouter.post('/profile/gallery', setUploadType('gallery'), upload.array('gallery_images', 10), csrfValidateMultipart, profileController.updateGallery);
 dashboardRouter.post('/profile/gallery/:index/delete', profileController.removeGalleryImage);
 dashboardRouter.post('/profile/videos', profileController.updateVideos);
 dashboardRouter.post('/profile/videos/:index/delete', profileController.removeVideo);
@@ -80,7 +81,7 @@ dashboardRouter.post('/profile/testimonials/:index/delete', profileController.re
 dashboardRouter.post('/profile/resume', profileController.updateResume);
 dashboardRouter.post('/profile/resume/:type/:index/delete', profileController.removeResumeItem);
 dashboardRouter.post('/profile/contact-form', profileController.toggleContactForm);
-dashboardRouter.post('/profile/background', setUploadType('background'), upload.single('background_image'), profileController.updateBackground);
+dashboardRouter.post('/profile/background', setUploadType('background'), upload.single('background_image'), csrfValidateMultipart, profileController.updateBackground);
 dashboardRouter.post('/profile/background/delete', profileController.removeBackground);
 
 // Email Signature
@@ -101,7 +102,7 @@ dashboardRouter.post('/links/reorder', linkController.reorder);
 
 // Payments
 dashboardRouter.get('/payments', paymentController.index);
-dashboardRouter.post('/payments', setUploadType('screenshot'), upload.single('screenshot'), paymentController.store);
+dashboardRouter.post('/payments', setUploadType('screenshot'), upload.single('screenshot'), csrfValidateMultipart, paymentController.store);
 
 router.use('/dashboard', dashboardRouter);
 
