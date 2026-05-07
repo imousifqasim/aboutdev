@@ -24,6 +24,17 @@ exports.store = async (req, res) => {
     return res.redirect('/dashboard/links');
   }
 
+  try {
+    const parsedUrl = new URL(url);
+    if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+      req.flash('error', 'URL must start with http:// or https://');
+      return res.redirect('/dashboard/links');
+    }
+  } catch {
+    req.flash('error', 'Please enter a valid URL.');
+    return res.redirect('/dashboard/links');
+  }
+
   const maxPos = await prisma.link.aggregate({ where: { userId: user.id }, _max: { position: true } });
   await prisma.link.create({
     data: {
@@ -44,6 +55,20 @@ exports.update = async (req, res) => {
   if (!link || link.userId !== req.user.id) return res.status(403).send('Forbidden');
 
   const { title, url, icon } = req.body;
+
+  if (url) {
+    try {
+      const parsedUrl = new URL(url);
+      if (!['http:', 'https:'].includes(parsedUrl.protocol)) {
+        req.flash('error', 'URL must start with http:// or https://');
+        return res.redirect('/dashboard/links');
+      }
+    } catch {
+      req.flash('error', 'Please enter a valid URL.');
+      return res.redirect('/dashboard/links');
+    }
+  }
+
   await prisma.link.update({
     where: { id: link.id },
     data: { title, url, icon: icon || null },

@@ -17,7 +17,7 @@ function csrfProtection(req, res, next) {
     return next();
   }
 
-  const token = req.body._csrf || req.headers['x-csrf-token'];
+  const token = (req.body && req.body._csrf) || req.headers['x-csrf-token'];
   const tokenIndex = token ? req.session.csrfTokens.indexOf(token) : -1;
   if (!token || tokenIndex === -1) {
     req.flash('error', 'Invalid or missing CSRF token. Please try again.');
