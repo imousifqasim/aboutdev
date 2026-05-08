@@ -5,6 +5,7 @@ const flash = require('connect-flash');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const loadUser = require('./src/middleware/loadUser');
+const loadSiteSettings = require('./src/middleware/siteSettings');
 const csrfProtection = require('./src/middleware/csrf');
 const routes = require('./src/routes');
 const { formatDate, timeAgo, formatCurrency } = require('./src/helpers');
@@ -52,6 +53,8 @@ app.use((req, res, next) => {
   res.locals.appUrl = process.env.APP_URL || 'http://localhost:8000';
   next();
 });
+
+app.use(loadSiteSettings);
 
 // Routes
 app.use('/', routes);

@@ -1,5 +1,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<% if (siteSettings) { %>
+<meta name="description" content="<%= siteSettings.siteDescription %>">
+<% if (siteSettings.siteKeywords) { %><meta name="keywords" content="<%= siteSettings.siteKeywords %>"><% } %>
+<% if (siteSettings.siteOgTitle) { %><meta property="og:title" content="<%= siteSettings.siteOgTitle %>"><% } %>
+<% if (siteSettings.siteOgDescription) { %><meta property="og:description" content="<%= siteSettings.siteOgDescription %>"><% } %>
+<% if (siteSettings.siteTwitterHandle) { %><meta name="twitter:site" content="<%= siteSettings.siteTwitterHandle %>"><% } %>
+<% if (siteSettings.siteOgImage) { %><meta property="og:image" content="<%= siteSettings.siteOgImage %>"><% } %>
+<% if (siteSettings.siteCanonicalUrl) { %><link rel="canonical" href="<%= siteSettings.siteCanonicalUrl %>"><% } %>
+<% } %>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config = { darkMode: 'class' }</script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">

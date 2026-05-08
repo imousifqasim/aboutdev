@@ -1,5 +1,6 @@
 const prisma = require('../prisma');
 const { isPremium } = require('../helpers');
+const { sendMail } = require('../mail');
 
 exports.show = async (req, res) => {
   const { username } = req.params;
@@ -82,6 +83,32 @@ exports.sendMessage = async (req, res) => {
     },
   });
 
-  req.flash('success', 'Message sent successfully!');
+  const profileUrl = profile.customDomain
+    ? `https://${profile.customDomain}`
+    : `${process.env.APP_URL || `http://${req.headers.host}`}/${profile.username}`;
+
+  const emailSubject = `New contact message from ${sender_name}`;
+  const emailHtml = `
+    <p>You have received a new message from your profile contact form.</p>
+    <p><strong>Name:</strong> ${sender_name}</p>
+    <p><strong>Email:</strong> ${sender_email}</p>
+    <p><strong>Message:</strong></p>
+    <p>${message.replace(/\n/g, '<br>')}</p>
+    <p><a href="${profileUrl}">View profile</a></p>
+  `;
+
+  try {
+    await sendMail({
+      to: profile.user.email,
+      subject: emailSubject,
+      html: emailHtml,
+      text: `New message from ${sender_name}: ${message}`,
+    });
+    req.flash('success', 'Message sent successfully! The profile owner has been notified.');
+  } catch (error) {
+    console.error('Contact form email error:', error.message || error);
+    req.flash('success', 'Message sent successfully! Email notification could not be delivered.');
+  }
+
   res.redirect(`/${username}`);
 };

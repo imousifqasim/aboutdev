@@ -2,9 +2,9 @@
 <html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
 <head><%- include('../../layouts/partials/head') %><title>Subscription - <%= appName %></title></head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-<div class="flex h-screen overflow-hidden">
+<div class="flex min-h-screen">
     <%- include('../../layouts/partials/user-sidebar') %>
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
         <%- include('../../layouts/partials/dashboard-header', { title: 'Subscription' }) %>
         <main class="flex-1 overflow-y-auto p-6">
             <%- include('../../layouts/partials/flash') %>
@@ -36,12 +36,13 @@
                     <form method="POST" action="/dashboard/payments" enctype="multipart/form-data" class="space-y-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <div class="grid md:grid-cols-2 gap-4">
                             <div><label class="block text-sm font-medium mb-1">Payment Method</label>
-                                <select name="method" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
-                                    <% paymentMethods.forEach(function(m) { %><option value="<%= m.value %>"><%= m.name %></option><% }) %>
+                                <select id="payment-method" name="method" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                                    <% paymentMethods.forEach(function(m) { %><option value="<%= m.value %>" data-currency="<%= m.currency %>"><%= m.name %></option><% }) %>
                                 </select>
                             </div>
-                            <div><label class="block text-sm font-medium mb-1">Amount</label><input type="number" name="amount" step="0.01" min="1" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                            <div><label class="block text-sm font-medium mb-1">Amount</label><input id="payment-amount" type="number" name="amount" step="0.01" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" readonly></div>
                         </div>
+                        <div id="payment-note" class="text-sm text-gray-500 dark:text-gray-400">Please choose a payment method to see the required amount.</div>
                         <div><label class="block text-sm font-medium mb-1">Transaction ID</label><input type="text" name="transaction_id" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
                         <div><label class="block text-sm font-medium mb-1">Screenshot</label><input type="file" name="screenshot" accept="image/*" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
                         <button type="submit" class="px-6 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition font-semibold"><i class="fas fa-paper-plane mr-2"></i>Submit Payment</button>
@@ -71,5 +72,29 @@
         </main>
     </div>
 </div>
+<script>
+(function() {
+  const paymentAmounts = {
+    binance: <%= premiumPriceUSD %>,
+    jazzcash: <%= premiumPricePKR %>,
+    raast: <%= premiumPricePKR %>,
+    meezan_bank: <%= premiumPricePKR %>,
+  };
+  const methodSelect = document.getElementById('payment-method');
+  const amountInput = document.getElementById('payment-amount');
+  const note = document.getElementById('payment-note');
+
+  function updateAmount() {
+    const method = methodSelect.value;
+    const currency = methodSelect.options[methodSelect.selectedIndex].dataset.currency || 'PKR';
+    const amount = paymentAmounts[method] || 0;
+    amountInput.value = amount;
+    note.textContent = `Pay exactly ${amount} ${currency} for this subscription method.`;
+  }
+
+  methodSelect.addEventListener('change', updateAmount);
+  updateAmount();
+})();
+</script>
 </body>
 </html>

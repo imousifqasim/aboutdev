@@ -2,9 +2,9 @@
 <html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
 <head><%- include('../layouts/partials/head') %><title>Email Signature - <%= appName %></title></head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-<div class="flex h-screen overflow-hidden">
+<div class="flex min-h-screen">
     <%- include('../layouts/partials/user-sidebar') %>
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
         <%- include('../layouts/partials/dashboard-header', { title: 'Email Signature' }) %>
         <main class="flex-1 overflow-y-auto p-6">
             <%- include('../layouts/partials/flash') %>
@@ -12,37 +12,100 @@
                 <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
                     <h3 class="font-semibold text-lg mb-4"><i class="fas fa-envelope mr-2"></i>Email Signature Generator</h3>
                     <p class="text-sm text-gray-500 dark:text-gray-400 mb-6">Copy the signature below and paste it into your email client settings.</p>
-                    <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6 mb-4" id="signature-preview">
-                        <table cellpadding="0" cellspacing="0" style="font-family: Arial, sans-serif;">
-                            <tr>
-                                <td style="padding-right: 15px; border-right: 2px solid #6366f1;">
-                                    <div style="width: 60px; height: 60px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold; text-align: center; line-height: 60px;"><%= user.name.charAt(0) %></div>
-                                </td>
-                                <td style="padding-left: 15px;">
-                                    <p style="margin: 0; font-weight: bold; font-size: 16px; color: #1f2937;"><%= user.name %></p>
-                                    <% if (user.profile && user.profile.bio) { %><p style="margin: 2px 0 0; font-size: 12px; color: #6b7280;"><%= user.profile.bio.substring(0, 60) %></p><% } %>
-                                    <p style="margin: 8px 0 0;"><a href="<%= appUrl %>/<%= user.profile ? user.profile.username : '' %>" style="color: #6366f1; text-decoration: none; font-size: 12px;">droplaunch.dev/<%= user.profile ? user.profile.username : '' %></a></p>
-                                </td>
-                            </tr>
-                        </table>
+                    <div class="grid gap-6 lg:grid-cols-2">
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Signature Style</label>
+                            <div class="grid grid-cols-2 gap-3">
+                                <% const signatureStyles = [{id:'classic',name:'Classic'},{id:'modern',name:'Modern'},{id:'minimal',name:'Minimal'},{id:'bold',name:'Bold'}]; %>
+                                <% signatureStyles.forEach(function(style) { %>
+                                <label class="cursor-pointer border border-gray-200 dark:border-gray-700 rounded-xl p-4 hover:border-indigo-500 transition <%= style.id === 'classic' ? 'bg-white dark:bg-gray-800' : '' %>">
+                                    <input type="radio" name="signatureStyle" value="<%= style.id %>" class="sr-only signature-style" <%= style.id === 'classic' ? 'checked' : '' %>>
+                                    <div class="font-semibold text-gray-800 dark:text-gray-100"><%= style.name %></div>
+                                </label>
+                                <% }) %>
+                            </div>
+                            <div class="mt-6 space-y-4">
+                                <div><label class="block text-sm font-medium mb-1">Display Name</label><input id="signature-name" type="text" value="<%= user.name %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></div>
+                                <div><label class="block text-sm font-medium mb-1">Title / Role</label><input id="signature-title" type="text" value="<%= user.profile && user.profile.company ? user.profile.company : '' %>" placeholder="Product Designer" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></div>
+                                <div><label class="block text-sm font-medium mb-1">Website</label><input id="signature-website" type="text" value="<%= user.profile && user.profile.website ? user.profile.website : '' %>" placeholder="https://example.com" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></div>
+                                <div><label class="block text-sm font-medium mb-1">Email</label><input id="signature-email" type="email" value="<%= user.email %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></div>
+                                <div><label class="block text-sm font-medium mb-1">Custom line</label><input id="signature-custom" type="text" placeholder="e.g. Available for freelance projects" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-2">Preview</label>
+                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg p-6" id="signature-preview"></div>
+                        </div>
                     </div>
-                    <button onclick="copySignature()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-copy mr-2"></i>Copy Signature HTML</button>
+                    <button id="copy-signature" class="mt-6 px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-copy mr-2"></i>Copy Signature HTML</button>
                 </div>
             </div>
         </main>
     </div>
 </div>
 <script>
+const defaultName = <%- JSON.stringify(user.name) %>;
+const defaultEmail = <%- JSON.stringify(user.email) %>;
+
+function buildSignature() {
+    const name = document.getElementById('signature-name').value || defaultName;
+    const title = document.getElementById('signature-title').value || '';
+    const website = document.getElementById('signature-website').value || '';
+    const email = document.getElementById('signature-email').value || defaultEmail;
+    const custom = document.getElementById('signature-custom').value || '';
+    const style = document.querySelector('input[name="signatureStyle"]:checked').value;
+
+    let themeStyle = '';
+    if (style === 'minimal') {
+        themeStyle = 'font-family: Arial, sans-serif; color: #1f2937;';
+    } else if (style === 'modern') {
+        themeStyle = 'font-family: Arial, sans-serif; color: #111827; background: #f8fafc; padding: 18px; border-radius: 12px;';
+    } else if (style === 'bold') {
+        themeStyle = 'font-family: Arial, sans-serif; color: #111827; background: #f3f4f6; padding: 18px; border-radius: 12px;';
+    } else {
+        themeStyle = 'font-family: Arial, sans-serif; color: #111827;';
+    }
+
+    const html = `
+        <div style="${themeStyle}">
+            <table cellpadding="0" cellspacing="0" style="width:100%; border-collapse: collapse;">
+                <tr>
+                    <td style="padding-right: 16px;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; background: #6366f1; display: flex; align-items: center; justify-content: center; color: white; font-size: 24px; font-weight: bold;">${name.charAt(0)}</div>
+                    </td>
+                    <td style="vertical-align: top;">
+                        <p style="margin:0; font-size:18px; font-weight:bold;">${name}</p>
+                        ${title ? `<p style="margin:4px 0 0; color:#4b5563;">${title}</p>` : ''}
+                        <p style="margin:10px 0 0; font-size:14px;">${email}</p>
+                        ${website ? `<p style="margin:4px 0 0; font-size:14px;"><a href="${website}" style="color:#4f46e5; text-decoration:none;">${website}</a></p>` : ''}
+                        ${custom ? `<p style="margin:10px 0 0; color:#6b7280; font-size:13px;">${custom}</p>` : ''}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    `;
+
+    document.getElementById('signature-preview').innerHTML = html;
+    document.getElementById('signature-preview').dataset.signatureHtml = html;
+}
+
 function copySignature() {
-    const el = document.getElementById('signature-preview');
-    const range = document.createRange();
-    range.selectNode(el);
-    window.getSelection().removeAllRanges();
-    window.getSelection().addRange(range);
+    const html = document.getElementById('signature-preview').dataset.signatureHtml || document.getElementById('signature-preview').innerHTML;
+    const textarea = document.createElement('textarea');
+    textarea.value = html;
+    document.body.appendChild(textarea);
+    textarea.select();
     document.execCommand('copy');
-    window.getSelection().removeAllRanges();
+    document.body.removeChild(textarea);
     alert('Signature copied!');
 }
+
+document.querySelectorAll('.signature-style, #signature-name, #signature-title, #signature-website, #signature-email, #signature-custom').forEach(el => {
+    el.addEventListener('input', buildSignature);
+    el.addEventListener('change', buildSignature);
+});
+
+buildSignature();
 </script>
 </body>
 </html>

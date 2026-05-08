@@ -244,9 +244,15 @@
                     <div class="absolute -top-4 right-8 bg-gradient-to-r from-amber-400 to-orange-500 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-lg"><i class="fas fa-crown mr-1"></i>POPULAR</div>
                     <h3 class="text-2xl font-bold">Premium</h3>
                     <p class="mt-2 text-indigo-200">Everything you need to grow</p>
-                    <div class="mt-6 flex items-baseline">
-                        <span class="text-5xl font-black">$<%= premiumPrice %></span>
-                        <span class="ml-2 text-indigo-200">/<%= premiumCurrency %>/year</span>
+                    <div class="mt-6 space-y-2">
+                        <div class="flex items-baseline">
+                            <span class="text-5xl font-black">$<%= premiumPriceUSD %></span>
+                            <span class="ml-2 text-indigo-200">/USD per year</span>
+                        </div>
+                        <div class="flex items-baseline">
+                            <span class="text-5xl font-black"><%= premiumPricePKR %></span>
+                            <span class="ml-2 text-indigo-200">/PKR per year</span>
+                        </div>
                     </div>
                     <ul class="mt-8 space-y-4">
                         <li class="flex items-center text-sm"><i class="fas fa-check w-5 h-5 text-yellow-300 mr-3"></i>Unlimited links</li>

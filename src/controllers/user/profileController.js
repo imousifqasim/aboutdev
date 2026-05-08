@@ -1,7 +1,22 @@
 const prisma = require('../../prisma');
 const { isPremium, RESERVED_USERNAMES } = require('../../helpers');
+const { sendMail } = require('../../mail');
 const path = require('path');
 const fs = require('fs');
+
+const industryThemes = [
+  'developers', 'web-designers', 'graphic-designers', 'ui-ux-designers', 'video-editors',
+  'content-creators', 'freelancers', 'digital-marketers', 'social-media-managers', 'photographers',
+  'videographers', 'animators', 'bloggers', 'writers', 'copywriters', 'seo-experts',
+  'app-developers', 'software-engineers', 'students', 'teachers', 'artists', 'musicians',
+  'streamers', 'influencers', 'entrepreneurs', 'business-owners', 'agencies', 'consultants',
+  'architects', 'fashion-designers', 'resume-builders', 'personal-brands', 'gamers', 'podcasters',
+  'public-speakers', 'virtual-assistants', 'e-commerce-sellers', 'trainers-coaches', 'crypto-traders',
+  'ai-creators', 'cyber-security-experts', 'wordpress-developers', 'shopify-experts', 'saas-founders', 'startup-teams'
+];
+const baseThemes = ['default', 'dark', 'minimal', 'gradient', 'bold', 'ocean', 'sunset', 'forest'];
+const validThemes = [...baseThemes, ...industryThemes];
+const premiumThemes = ['gradient', 'bold', 'ocean', 'sunset', 'forest', ...industryThemes];
 
 function cleanupFile(req) {
   if (req.file && req.file.path) {
@@ -25,7 +40,7 @@ exports.edit = async (req, res) => {
 exports.update = async (req, res) => {
   const user = req.user;
   const profile = user.profile;
-  const { name, username, bio, location, company, website, meta_title, meta_description } = req.body;
+  const { name, username, bio, location, company, website, custom_domain, meta_title, meta_description } = req.body;
 
   if (!name || !username) {
     cleanupFile(req);
@@ -50,12 +65,37 @@ exports.update = async (req, res) => {
 
   await prisma.user.update({ where: { id: user.id }, data: { name } });
 
+  const customDomain = custom_domain ? custom_domain.trim().toLowerCase() : null;
+  if (customDomain && !req.user.isPremiumUser) {
+    cleanupFile(req);
+    req.flash('error', 'Custom domain requires a premium subscription.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  if (customDomain && !/^[a-z0-9.-]+$/.test(customDomain)) {
+    cleanupFile(req);
+    req.flash('error', 'Custom domain contains invalid characters.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  if (customDomain) {
+    const existingDomain = await prisma.profile.findFirst({
+      where: { customDomain, NOT: { id: profile.id } },
+    });
+    if (existingDomain) {
+      cleanupFile(req);
+      req.flash('error', 'This custom domain is already in use.');
+      return res.redirect('/dashboard/profile');
+    }
+  }
+
   const data = {
     username: username.toLowerCase(),
     bio: bio || null,
     location: location || null,
     company: company || null,
     website: website || null,
+    customDomain: customDomain || null,
     metaTitle: meta_title || null,
     metaDescription: meta_description || null,
   };
@@ -82,14 +122,12 @@ exports.update = async (req, res) => {
 };
 
 exports.updateTheme = async (req, res) => {
-  const { theme } = req.body;
-  const validThemes = ['default', 'dark', 'gradient', 'minimal', 'bold', 'ocean', 'sunset', 'forest'];
+  const theme = req.body.industry_theme || req.body.theme;
   if (!validThemes.includes(theme)) {
     req.flash('error', 'Invalid theme.');
     return res.redirect('/dashboard/profile');
   }
 
-  const premiumThemes = ['gradient', 'bold', 'ocean', 'sunset', 'forest'];
   if (premiumThemes.includes(theme) && !req.user.isPremiumUser) {
     req.flash('error', 'This theme requires a premium subscription.');
     return res.redirect('/dashboard/profile');
@@ -343,6 +381,43 @@ exports.markMessageRead = async (req, res) => {
   }
   await prisma.contactMessage.update({ where: { id: message.id }, data: { isRead: true } });
   req.flash('success', 'Message marked as read.');
+  res.redirect('/dashboard/messages');
+};
+
+exports.replyMessage = async (req, res) => {
+  const message = await prisma.contactMessage.findUnique({ where: { id: parseInt(req.params.id) } });
+  if (!message || message.userId !== req.user.id) {
+    return res.status(403).send('Forbidden');
+  }
+
+  const { reply_message } = req.body;
+  if (!reply_message) {
+    req.flash('error', 'Reply message cannot be blank.');
+    return res.redirect('/dashboard/messages');
+  }
+
+  const emailSubject = `Reply from ${req.user.name}`;
+  const emailHtml = `
+    <p>${req.user.name} has replied to your message.</p>
+    <p><strong>Reply:</strong></p>
+    <p>${reply_message.replace(/\n/g, '<br>')}</p>
+    <p>You can contact them at <strong>${req.user.email}</strong> if needed.</p>
+  `;
+
+  try {
+    await sendMail({
+      to: message.senderEmail,
+      subject: emailSubject,
+      html: emailHtml,
+      text: `Reply from ${req.user.name}: ${reply_message}`,
+    });
+    await prisma.contactMessage.update({ where: { id: message.id }, data: { isRead: true } });
+    req.flash('success', 'Reply sent successfully!');
+  } catch (error) {
+    console.error('Reply email error:', error.message || error);
+    req.flash('error', 'Reply could not be sent. Please try again later.');
+  }
+
   res.redirect('/dashboard/messages');
 };
 
