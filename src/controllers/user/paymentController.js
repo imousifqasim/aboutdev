@@ -1,6 +1,6 @@
 const fs = require('fs');
 const prisma = require('../../prisma');
-const { isPremium } = require('../../helpers');
+const { isPremium, getSetting } = require('../../helpers');
 
 function cleanupFile(req) {
   if (req.file && req.file.path) {
@@ -9,10 +9,10 @@ function cleanupFile(req) {
 }
 
 const PAYMENT_METHODS = [
-  { name: 'Binance (USDT)', value: 'binance', details: 'UID: 827969859' },
-  { name: 'JazzCash', value: 'jazzcash', details: 'Number: 03286477314' },
-  { name: 'Raast ID', value: 'raast', details: 'ID: 03286477314' },
-  { name: 'Meezan Bank', value: 'meezan_bank', details: 'Account: 26720109424781 | Title: Tousif Ahmad' },
+  { name: 'Binance (USDT)', value: 'binance', details: 'Pay in USD via Binance USDT', currency: 'USD' },
+  { name: 'JazzCash', value: 'jazzcash', details: 'Pay in PKR via JazzCash', currency: 'PKR' },
+  { name: 'Raast ID', value: 'raast', details: 'Pay in PKR via Raast ID', currency: 'PKR' },
+  { name: 'Meezan Bank', value: 'meezan_bank', details: 'Pay in PKR via Meezan Bank', currency: 'PKR' },
 ];
 
 exports.index = async (req, res) => {
@@ -27,6 +27,8 @@ exports.index = async (req, res) => {
     orderBy: { createdAt: 'desc' },
   });
   const unreadCount = await prisma.contactMessage.count({ where: { userId: user.id, isRead: false } });
+  const premiumPriceUSD = parseFloat(await getSetting('premium_price_usd', '9.99')) || 9.99;
+  const premiumPricePKR = parseFloat(await getSetting('premium_price_pkr', '2999')) || 2999;
 
   res.render('user/payments/index', {
     title: 'Subscription & Payments',
@@ -35,6 +37,8 @@ exports.index = async (req, res) => {
     paymentMethods: PAYMENT_METHODS,
     activeSubscription,
     unreadCount,
+    premiumPriceUSD,
+    premiumPricePKR,
   });
 };
 
@@ -57,6 +61,15 @@ exports.store = async (req, res) => {
   if (existingTx) {
     cleanupFile(req);
     req.flash('error', 'This transaction ID has already been used.');
+    return res.redirect('/dashboard/payments');
+  }
+
+  const premiumPriceUSD = parseFloat(await getSetting('premium_price_usd', '9.99')) || 9.99;
+  const premiumPricePKR = parseFloat(await getSetting('premium_price_pkr', '2999')) || 2999;
+  const expectedAmount = method === 'binance' ? premiumPriceUSD : premiumPricePKR;
+  if (Number(amount) !== expectedAmount) {
+    cleanupFile(req);
+    req.flash('error', `Please pay the exact required amount: ${expectedAmount} ${method === 'binance' ? 'USD' : 'PKR'}.`);
     return res.redirect('/dashboard/payments');
   }
 

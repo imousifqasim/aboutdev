@@ -2,9 +2,9 @@
 <html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
 <head><%- include('../../layouts/partials/head') %><title>Edit Profile - <%= appName %></title></head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
-<div class="flex h-screen overflow-hidden">
+<div class="flex min-h-screen">
     <%- include('../../layouts/partials/user-sidebar') %>
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
         <%- include('../../layouts/partials/dashboard-header', { title: 'Edit Profile' }) %>
         <main class="flex-1 overflow-y-auto p-6">
             <%- include('../../layouts/partials/flash') %>
@@ -25,6 +25,21 @@
                             <div><label class="block text-sm font-medium mb-1">Company</label><input type="text" name="company" value="<%= user.profile && user.profile.company ? user.profile.company : '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
                         </div>
                         <div><label class="block text-sm font-medium mb-1">Website</label><input type="url" name="website" value="<%= user.profile && user.profile.website ? user.profile.website : '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        <div><label class="block text-sm font-medium mb-1">Custom Domain</label><input type="text" name="custom_domain" value="<%= user.profile && user.profile.customDomain ? user.profile.customDomain : '' %>" placeholder="yourdomain.com" <%= !user.isPremiumUser ? 'disabled' : '' %> class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        <% if (!user.isPremiumUser) { %>
+                        <p class="text-xs text-amber-600 dark:text-amber-400">Custom domain is available on premium plans only.</p>
+                        <% } else { %>
+                        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 text-sm text-gray-600 dark:text-gray-300">
+                            <p class="font-medium mb-2">DNS Setup Instructions</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Enter the domain you own, such as <span class="font-mono">example.com</span> or <span class="font-mono">www.example.com</span>.</li>
+                                <li>For a subdomain, add a <strong>CNAME</strong> record pointing to <span class="font-mono"><%= siteSettings && siteSettings.customDomainTarget ? siteSettings.customDomainTarget : appUrl.replace(/^https?:\/\//, '') %></span>.</li>
+                                <li>For a root domain, add an <strong>A</strong> record pointing to your app server IP address.</li>
+                                <li>Wait up to 24 hours for DNS propagation, then refresh your profile.</li>
+                            </ul>
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">If you do not have the server IP, ask your hosting provider or use a CNAME for a subdomain.</p>
+                        </div>
+                        <% } %>
                         <div><label class="block text-sm font-medium mb-1">Profile Image</label><input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
                         <h4 class="font-medium mt-4">Social Links</h4>
                         <div class="grid md:grid-cols-2 gap-4">
@@ -46,15 +61,39 @@
                     <h3 class="font-semibold text-lg mb-4"><i class="fas fa-palette mr-2"></i>Theme</h3>
                     <form method="POST" action="/dashboard/profile/theme"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                            <% var themes = [{id:'default',name:'Default',colors:'bg-white border-2 border-gray-300',text:'text-gray-700'},{id:'dark',name:'Dark',colors:'bg-gray-800 border-2 border-gray-600',text:'text-white'},{id:'minimal',name:'Minimal',colors:'bg-gray-100 border-2 border-gray-200',text:'text-gray-700'},{id:'gradient',name:'Gradient',colors:'bg-gradient-to-r from-purple-500 to-pink-500',text:'text-white',premium:true},{id:'bold',name:'Bold',colors:'bg-red-600',text:'text-white',premium:true},{id:'ocean',name:'Ocean',colors:'bg-gradient-to-r from-cyan-500 to-blue-500',text:'text-white',premium:true},{id:'sunset',name:'Sunset',colors:'bg-gradient-to-r from-orange-500 to-red-500',text:'text-white',premium:true},{id:'forest',name:'Forest',colors:'bg-gradient-to-r from-green-600 to-emerald-500',text:'text-white',premium:true}]; %>
+                            <% var themes = [
+                                {id:'default',name:'Default',colors:'bg-white border-2 border-gray-300',text:'text-gray-700'},
+                                {id:'dark',name:'Dark',colors:'bg-gray-800 border-2 border-gray-600',text:'text-white'},
+                                {id:'minimal',name:'Minimal',colors:'bg-gray-100 border-2 border-gray-200',text:'text-gray-700'},
+                                {id:'gradient',name:'Gradient',colors:'bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 shadow-xl',text:'text-white',premium:true},
+                                {id:'bold',name:'Bold',colors:'bg-gradient-to-br from-rose-800 via-red-700 to-orange-500 shadow-xl',text:'text-white',premium:true},
+                                {id:'ocean',name:'Ocean',colors:'bg-gradient-to-br from-slate-900 via-cyan-600 to-teal-400 shadow-xl',text:'text-white',premium:true},
+                                {id:'sunset',name:'Sunset',colors:'bg-gradient-to-br from-orange-500 via-rose-500 to-fuchsia-500 shadow-xl',text:'text-white',premium:true},
+                                {id:'forest',name:'Forest',colors:'bg-gradient-to-br from-emerald-900 via-lime-600 to-emerald-500 shadow-xl',text:'text-white',premium:true}
+                            ];
+                            var industryThemes = [
+                                {id:'developers',name:'Developers'},{id:'web-designers',name:'Web Designers'},{id:'graphic-designers',name:'Graphic Designers'},{id:'ui-ux-designers',name:'UI/UX Designers'},{id:'video-editors',name:'Video Editors'},{id:'content-creators',name:'Content Creators'},{id:'freelancers',name:'Freelancers'},{id:'digital-marketers',name:'Digital Marketers'},{id:'social-media-managers',name:'Social Media Managers'},{id:'photographers',name:'Photographers'},{id:'videographers',name:'Videographers'},{id:'animators',name:'Animators'},{id:'bloggers',name:'Bloggers'},{id:'writers',name:'Writers'},{id:'copywriters',name:'Copywriters'},{id:'seo-experts',name:'SEO Experts'},{id:'app-developers',name:'App Developers'},{id:'software-engineers',name:'Software Engineers'},{id:'students',name:'Students'},{id:'teachers',name:'Teachers'},{id:'artists',name:'Artists'},{id:'musicians',name:'Musicians'},{id:'streamers',name:'Streamers'},{id:'influencers',name:'Influencers'},{id:'entrepreneurs',name:'Entrepreneurs'},{id:'business-owners',name:'Business Owners'},{id:'agencies',name:'Agencies'},{id:'consultants',name:'Consultants'},{id:'architects',name:'Architects'},{id:'fashion-designers',name:'Fashion Designers'},{id:'resume-builders',name:'Resume Builders'},{id:'personal-brands',name:'Personal Brands'},{id:'gamers',name:'Gamers'},{id:'podcasters',name:'Podcasters'},{id:'public-speakers',name:'Public Speakers'},{id:'virtual-assistants',name:'Virtual Assistants'},{id:'e-commerce-sellers',name:'E-commerce Sellers'},{id:'trainers-coaches',name:'Trainers & Coaches'},{id:'crypto-traders',name:'Crypto Traders'},{id:'ai-creators',name:'AI Creators'},{id:'cyber-security-experts',name:'Cyber Security Experts'},{id:'wordpress-developers',name:'WordPress Developers'},{id:'shopify-experts',name:'Shopify Experts'},{id:'saas-founders',name:'SaaS Founders'},{id:'startup-teams',name:'Startup Teams'}
+                            ]; %>
                             <% themes.forEach(function(t) { %>
                             <label class="cursor-pointer">
                                 <input type="radio" name="theme" value="<%= t.id %>" <%= user.profile && user.profile.theme === t.id ? 'checked' : '' %> class="sr-only peer">
-                                <div class="h-20 rounded-lg <%= t.colors %> peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:ring-offset-2 flex items-end p-2">
-                                    <span class="text-xs font-medium <%= t.text %>"><%= t.name %><% if (t.premium) { %> <i class="fas fa-crown text-yellow-400"></i><% } %></span>
+                                <div class="h-24 rounded-lg overflow-hidden border-2 border-transparent <%= t.colors %> peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:ring-offset-2 peer-checked:ring-offset-white dark:peer-checked:ring-offset-gray-800 flex items-end justify-between p-2 transition-all duration-200 shadow-lg hover:-translate-y-0.5 <%= t.premium ? 'border-yellow-300 shadow-yellow-400/20' : '' %>">
+                                    <span class="text-xs font-medium <%= t.text %>"><%= t.name %></span>
+                                    <% if (t.premium) { %><span class="ml-2 inline-flex items-center rounded-full bg-yellow-400 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-900">Premium</span><% } %>
                                 </div>
                             </label>
                             <% }) %>
+                        </div>
+                        <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <h4 class="font-semibold text-lg mb-3">Industry Premium Theme</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Choose a premium theme built for your profession or niche.</p>
+                            <select name="industry_theme" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                                <option value="">Select your professional theme</option>
+                                <% industryThemes.forEach(function(t) { %>
+                                <option value="<%= t.id %>" <%= user.profile && user.profile.theme === t.id ? 'selected' : '' %>><%= t.name %></option>
+                                <% }) %>
+                            </select>
+                            <p class="mt-3 text-xs text-amber-600 dark:text-amber-400"><%= user.isPremiumUser ? 'Pick a premium theme that matches your profession.' : 'Upgrade to premium to unlock tailored industry themes.' %></p>
                         </div>
                         <button type="submit" class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-save mr-2"></i>Save Theme</button>
                     </form>

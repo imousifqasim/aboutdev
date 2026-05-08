@@ -90,6 +90,7 @@ dashboardRouter.get('/email-signature', profileController.emailSignature);
 // Messages
 dashboardRouter.get('/messages', profileController.messages);
 dashboardRouter.post('/messages/:id/read', profileController.markMessageRead);
+dashboardRouter.post('/messages/:id/reply', profileController.replyMessage);
 dashboardRouter.post('/messages/:id/delete', profileController.deleteMessage);
 
 // Links
