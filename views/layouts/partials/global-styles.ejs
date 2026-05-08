@@ -1,0 +1,119 @@
+<style>
+:root {
+    color-scheme: light;
+    font-family: 'Inter', sans-serif;
+}
+html {
+    scroll-behavior: smooth;
+}
+body {
+    font-family: 'Inter', sans-serif;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+button, input, select, textarea {
+    font: inherit;
+}
+::selection {
+    background: rgba(99, 102, 241, 0.18);
+    color: inherit;
+}
+.btn-primary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    padding: 0.95rem 1.5rem;
+    background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+    color: white;
+    font-weight: 700;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+}
+.btn-primary:hover,
+.btn-primary:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 20px 50px rgba(99, 102, 241, 0.18);
+    opacity: 0.98;
+}
+.btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 1rem;
+    padding: 0.95rem 1.5rem;
+    background: rgba(15, 23, 42, 0.95);
+    color: white;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.btn-secondary:hover,
+.btn-secondary:focus-visible {
+    transform: translateY(-1px);
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.22);
+}
+.card,
+.card-soft {
+    border-radius: 1.25rem;
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.08);
+}
+.dark .card,
+.dark .card-soft {
+    background: rgba(15, 23, 42, 0.86);
+    border-color: rgba(148, 163, 184, 0.12);
+    box-shadow: 0 24px 80px rgba(15, 23, 42, 0.16);
+}
+.card-soft {
+    background: rgba(243, 244, 246, 0.92);
+}
+.dark .card-soft {
+    background: rgba(30, 41, 59, 0.82);
+}
+.input,
+.select,
+.textarea {
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.28);
+    background: rgba(255, 255, 255, 0.92);
+    color: #0f172a;
+    padding: 0.85rem 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.dark .input,
+.dark .select,
+.dark .textarea {
+    background: rgba(15, 23, 42, 0.88);
+    color: #f8fafc;
+    border-color: rgba(100, 116, 139, 0.35);
+}
+.input:focus,
+.select:focus,
+.textarea:focus {
+    outline: none;
+    border-color: rgba(99, 102, 241, 0.65);
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.12);
+}
+.section-title {
+    font-size: 1.875rem;
+    line-height: 1.1;
+    font-weight: 800;
+}
+.section-subtitle {
+    color: #64748b;
+}
+.dark .section-subtitle {
+    color: #94a3b8;
+}
+.card-group > * + * {
+    margin-top: 1rem;
+}
+@media (max-width: 768px) {
+    .card,
+    .card-soft {
+        border-radius: 1rem;
+    }
+}
+</style>

@@ -6,10 +6,10 @@
     <%- include('../../layouts/partials/admin-sidebar') %>
     <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
         <%- include('../../layouts/partials/dashboard-header', { title: 'Settings' }) %>
-        <main class="flex-1 overflow-y-auto p-6">
+        <main class="flex-1 overflow-y-auto p-5">
             <%- include('../../layouts/partials/flash') %>
             <div class="max-w-4xl">
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-gray-200 dark:border-gray-700">
                     <h3 class="font-semibold text-lg mb-4"><i class="fas fa-cog mr-2"></i>Site Settings</h3>
                     <form method="POST" action="/admin/settings" class="space-y-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
                         <div class="grid md:grid-cols-2 gap-4">

@@ -1,21 +1,21 @@
 <aside class="hidden md:flex md:flex-shrink-0">
-    <div class="flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700">
-        <div class="flex items-center h-16 px-4 border-b border-gray-200 dark:border-gray-700">
-            <a href="/" class="text-xl font-bold text-indigo-600 dark:text-indigo-400"><i class="fas fa-rocket mr-2"></i><%= appName %></a>
+    <div class="flex flex-col w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-sm">
+        <div class="flex items-center h-14 px-4 border-b border-gray-200 dark:border-gray-700">
+            <a href="/" class="text-lg font-bold text-indigo-600 dark:text-indigo-400"><i class="fas fa-rocket mr-2"></i><%= appName %></a>
         </div>
-        <nav class="flex-1 px-2 py-4 space-y-1">
-            <a href="/admin" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-tachometer-alt w-5 mr-3"></i>Dashboard</a>
-            <a href="/admin/users" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-users w-5 mr-3"></i>Users</a>
-            <a href="/admin/payments" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-credit-card w-5 mr-3"></i>Payments</a>
-            <a href="/admin/subscriptions" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-crown w-5 mr-3"></i>Subscriptions</a>
-            <a href="/admin/settings" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-cog w-5 mr-3"></i>Settings</a>
+        <nav class="flex-1 px-2 py-3 space-y-1">
+            <a href="/admin" class="flex items-center px-3 py-2 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-tachometer-alt w-5 mr-3"></i>Dashboard</a>
+            <a href="/admin/users" class="flex items-center px-3 py-2 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-users w-5 mr-3"></i>Users</a>
+            <a href="/admin/payments" class="flex items-center px-3 py-2 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-credit-card w-5 mr-3"></i>Payments</a>
+            <a href="/admin/subscriptions" class="flex items-center px-3 py-2 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-crown w-5 mr-3"></i>Subscriptions</a>
+            <a href="/admin/settings" class="flex items-center px-3 py-2 text-sm font-medium rounded-xl hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-cog w-5 mr-3"></i>Settings</a>
             <hr class="my-2 border-gray-200 dark:border-gray-700">
             <a href="/dashboard" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300"><i class="fas fa-arrow-left w-5 mr-3"></i>User Dashboard</a>
         </nav>
-        <div class="p-4 border-t border-gray-200 dark:border-gray-700">
-            <div class="flex items-center">
+        <div class="px-4 py-3 border-t border-gray-200 dark:border-gray-700">
+            <div class="flex items-center gap-3">
                 <div class="w-8 h-8 rounded-full bg-indigo-500 flex items-center justify-center text-white text-sm font-bold"><%= user.name.charAt(0).toUpperCase() %></div>
-                <div class="ml-3"><p class="text-sm font-medium"><%= user.name %></p><p class="text-xs text-gray-500 dark:text-gray-400"><%= user.email %></p></div>
+                <div><p class="text-sm font-medium"><%= user.name %></p><p class="text-xs text-gray-500 dark:text-gray-400"><%= user.email %></p></div>
             </div>
         </div>
     </div>

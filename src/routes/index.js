@@ -59,6 +59,10 @@ router.get('/login', isGuest, loginController.showLoginForm);
 router.post('/login', isGuest, loginController.login);
 router.get('/register', isGuest, registerController.showRegistrationForm);
 router.post('/register', isGuest, registerController.register);
+router.get('/forgot-password', isGuest, loginController.showForgotPasswordForm);
+router.post('/forgot-password', isGuest, loginController.forgotPassword);
+router.get('/reset-password/:token', isGuest, loginController.showResetPasswordForm);
+router.post('/reset-password/:token', isGuest, loginController.resetPassword);
 router.post('/logout', loginController.logout);
 
 // User Dashboard Routes
@@ -70,6 +74,7 @@ dashboardRouter.get('/', dashboardController.index);
 // Profile
 dashboardRouter.get('/profile', profileController.edit);
 dashboardRouter.post('/profile', setUploadType('profiles'), upload.single('image'), csrfValidateMultipart, profileController.update);
+dashboardRouter.post('/profile/password', profileController.updatePassword);
 dashboardRouter.post('/profile/theme', profileController.updateTheme);
 dashboardRouter.post('/profile/gallery', setUploadType('gallery'), upload.array('gallery_images', 10), csrfValidateMultipart, profileController.updateGallery);
 dashboardRouter.post('/profile/gallery/:index/delete', profileController.removeGalleryImage);
@@ -83,6 +88,11 @@ dashboardRouter.post('/profile/resume/:type/:index/delete', profileController.re
 dashboardRouter.post('/profile/contact-form', profileController.toggleContactForm);
 dashboardRouter.post('/profile/background', setUploadType('background'), upload.single('background_image'), csrfValidateMultipart, profileController.updateBackground);
 dashboardRouter.post('/profile/background/delete', profileController.removeBackground);
+dashboardRouter.post('/profile/pages', profileController.updatePages);
+dashboardRouter.post('/profile/pages/:id/delete', profileController.removePage);
+dashboardRouter.post('/profile/integrations', profileController.updateIntegrations);
+dashboardRouter.post('/profile/footer', profileController.updateFooter);
+dashboardRouter.post('/profile/default-theme', profileController.updateDefaultTheme);
 
 // Email Signature
 dashboardRouter.get('/email-signature', profileController.emailSignature);
@@ -132,6 +142,9 @@ router.get('/click/:id', publicProfileController.trackClick);
 
 // Contact Form
 router.post('/:username/contact', publicProfileController.sendMessage);
+
+// Custom Pages
+router.get('/:username/:pageSlug', publicProfileController.showPage);
 
 // Public Profile (must be last)
 router.get('/:username', publicProfileController.show);

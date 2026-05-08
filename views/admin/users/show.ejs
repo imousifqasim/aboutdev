@@ -6,10 +6,10 @@
     <%- include('../../layouts/partials/admin-sidebar') %>
     <div class="flex-1 flex flex-col overflow-hidden">
         <%- include('../../layouts/partials/dashboard-header', { title: 'User Details' }) %>
-        <main class="flex-1 overflow-y-auto p-6">
+        <main class="flex-1 overflow-y-auto p-5">
             <%- include('../../layouts/partials/flash') %>
-            <div class="max-w-4xl space-y-6">
-                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+            <div class="max-w-4xl space-y-5">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-gray-200 dark:border-gray-700">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center space-x-4">
                             <div class="w-16 h-16 rounded-full bg-indigo-500 flex items-center justify-center text-white text-2xl font-bold"><%= targetUser.name.charAt(0) %></div>
@@ -27,13 +27,13 @@
                     </div>
                 </div>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-gray-200 dark:border-gray-700 text-center">
                         <p class="text-sm text-gray-500">Plan</p><p class="text-lg font-bold mt-1"><% if (targetUser.profile && targetUser.profile.isPremium) { %><i class="fas fa-crown text-yellow-500 mr-1"></i>Premium<% } else { %>Free<% } %></p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-gray-200 dark:border-gray-700 text-center">
                         <p class="text-sm text-gray-500">Links</p><p class="text-lg font-bold mt-1"><%= targetUser.links ? targetUser.links.length : 0 %></p>
                     </div>
-                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 text-center">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-gray-200 dark:border-gray-700 text-center">
                         <p class="text-sm text-gray-500">Joined</p><p class="text-lg font-bold mt-1"><%= new Date(targetUser.createdAt).toLocaleDateString() %></p>
                     </div>
                 </div>

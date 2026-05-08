@@ -6,10 +6,10 @@
     <%- include('../../layouts/partials/admin-sidebar') %>
     <div class="flex-1 flex flex-col overflow-hidden">
         <%- include('../../layouts/partials/dashboard-header', { title: 'Users' }) %>
-        <main class="flex-1 overflow-y-auto p-6">
+        <main class="flex-1 overflow-y-auto p-5">
             <%- include('../../layouts/partials/flash') %>
-            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
-                <div class="p-4 border-b border-gray-200 dark:border-gray-700">
+            <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-md border border-gray-200 dark:border-gray-700">
+                <div class="p-3 border-b border-gray-200 dark:border-gray-700">
                     <form method="GET" action="/admin/users" class="flex items-center space-x-3">
                         <input type="text" name="search" value="<%= typeof search !== 'undefined' ? search : '' %>" placeholder="Search users..." class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
                         <select name="status" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">

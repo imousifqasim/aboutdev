@@ -16,11 +16,14 @@ model User {
   isBanned         Boolean          @default(false) @map("is_banned")
   emailVerifiedAt  DateTime?        @map("email_verified_at")
   rememberToken    String?          @map("remember_token")
+  resetToken       String?          @map("reset_token")
+  resetTokenExpires DateTime?       @map("reset_token_expires")
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
 
   profile          Profile?
   links            Link[]
+  linkCategories   LinkCategory[]
   payments         Payment[]        @relation("UserPayments")
   reviewedPayments Payment[]        @relation("ReviewerPayments")
   subscriptions    Subscription[]
@@ -47,6 +50,13 @@ model Profile {
   metaTitle             String?  @map("meta_title")
   metaDescription       String?  @map("meta_description") @db.Text
   ogImage               String?  @map("og_image")
+  ogTitle               String?  @map("og_title")
+  ogDescription         String?  @map("og_description") @db.Text
+  focusKeyword          String?  @map("focus_keyword")
+  seoSettings           Json?    @map("seo_settings")
+  portfolioData         Json?    @map("portfolio_data")
+  builderSettings       Json?    @map("builder_settings")
+  advancedSeo           Json?    @map("advanced_seo")
   showBranding          Boolean  @default(true) @map("show_branding")
   customDomain          String?  @map("custom_domain")
   spotlightLabel        String?  @map("spotlight_label")
@@ -57,6 +67,10 @@ model Profile {
   contactFormEnabled    Boolean  @default(false) @map("contact_form_enabled")
   backgroundImage       String?  @map("background_image")
   emailSignatureEnabled Boolean  @default(true) @map("email_signature_enabled")
+  pages                 Json?    // Custom pages with text and notes
+  integrations          Json?    // Integration settings
+  footer                Json?    // Footer content and settings
+  defaultTheme          String?  @map("default_theme") // Default theme for new users
   createdAt             DateTime @default(now()) @map("created_at")
   updatedAt             DateTime @updatedAt @map("updated_at")
 
@@ -65,19 +79,41 @@ model Profile {
   @@map("profiles")
 }
 
-model Link {
+model LinkCategory {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
-  title     String
-  url       String   @db.VarChar(500)
-  icon      String?
+  name      String
+  icon      String?  @default("folder")
+  color     String?  @default("#4f46e5")
   position  Int      @default(0)
   isActive  Boolean  @default(true) @map("is_active")
-  clicks    Int      @default(0)
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user  User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  links Link[]
+
+  @@unique([userId, name])
+  @@map("link_categories")
+}
+
+model Link {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  categoryId Int?     @map("category_id")
+  title      String
+  url        String   @db.VarChar(500)
+  icon       String?
+  position   Int      @default(0)
+  isActive   Boolean  @default(true) @map("is_active")
+  clicks     Int      @default(0)
+  views      Int      @default(0)
+  lastClickAt DateTime? @map("last_click_at")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  user     User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category LinkCategory?  @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   @@map("links")
 }
