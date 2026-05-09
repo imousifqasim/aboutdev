@@ -37,6 +37,7 @@ exports.show = async (req, res) => {
       payments: { orderBy: { createdAt: 'desc' } },
       subscriptions: { orderBy: { createdAt: 'desc' } },
       analytics: { orderBy: { date: 'desc' }, take: 30 },
+      loginHistory: { orderBy: { createdAt: 'desc' }, take: 10 },
     },
   });
 
@@ -45,7 +46,41 @@ exports.show = async (req, res) => {
     return res.redirect('/admin/users');
   }
 
-  res.render('admin/users/show', { title: `User: ${user.name}`, user: req.user, targetUser: user });
+  res.render('admin/users/show', { title: `User: ${user.name}`, user, csrfToken: req.csrfToken() });
+};
+
+exports.update = async (req, res) => {
+  const { name, email, role } = req.body;
+  const userId = parseInt(req.params.id);
+
+  try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      req.flash('error', 'User not found.');
+      return res.redirect('/admin/users');
+    }
+
+    // Check if email is already taken by another user
+    if (email !== user.email) {
+      const existingUser = await prisma.user.findUnique({ where: { email } });
+      if (existingUser) {
+        req.flash('error', 'Email is already taken by another user.');
+        return res.redirect(`/admin/users/${userId}`);
+      }
+    }
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: { name, email, role }
+    });
+
+    req.flash('success', 'User updated successfully.');
+  } catch (error) {
+    console.error('Error updating user:', error);
+    req.flash('error', 'Failed to update user.');
+  }
+
+  res.redirect(`/admin/users/${userId}`);
 };
 
 exports.toggleBan = async (req, res) => {

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= profile.metaTitle || (user.name + ' - Portfolio') %></title>
+    <meta name="description" content="<%= profile.metaDescription || profile.bio || '' %>">
+    <meta property="og:title" content="<%= profile.ogTitle || profile.metaTitle || user.name %>">
+    <meta property="og:description" content="<%= profile.ogDescription || profile.metaDescription || profile.bio || '' %>">
+    <% if (profile.ogImage) { %><meta property="og:image" content="/uploads/<%= profile.ogImage %>"><% } %>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= appUrl %>/<%= profile.username %>/portfolio">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .hero-bg { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .section-padding { padding: 4rem 0; }
+        .animate-fade-in { animation: fadeIn 0.6s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-sm z-50 border-b border-gray-200 dark:border-gray-700">
+        <div class="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <% if (profile.image) { %>
+                <img src="/uploads/<%= profile.image %>" alt="<%= user.name %>" class="w-10 h-10 rounded-full object-cover">
+                <% } %>
+                <span class="font-semibold"><%= user.name %></span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <a href="/<%= profile.username %>" class="text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100">Profile</a>
+                <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800">
+                    <i class="fas" :class="darkMode ? 'fa-sun' : 'fa-moon'"></i>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Portfolio Content -->
+    <main class="pt-20">
+        <% portfolioData.sections.forEach((section, index) => { %>
+            <% if (section.type === 'hero') { %>
+            <section class="hero-bg text-white section-padding animate-fade-in" style="<%= section.content.backgroundImage ? `background-image: url(${section.content.backgroundImage}); background-size: cover; background-position: center;` : '' %>">
+                <div class="max-w-4xl mx-auto text-center px-4">
+                    <h1 class="text-5xl md:text-6xl font-bold mb-6" style="color: <%= section.content.textColor || '#ffffff' %>"><%= section.content.title || user.name %></h1>
+                    <p class="text-xl md:text-2xl mb-8" style="color: <%= section.content.textColor || '#ffffff' %>"><%= section.content.subtitle || 'Welcome to my portfolio' %></p>
+                    <div class="flex justify-center space-x-4">
+                        <% if (profile.socialLinks) { %>
+                            <% Object.keys(profile.socialLinks).forEach(platform => { %>
+                                <% if (profile.socialLinks[platform]) { %>
+                                <a href="<%= profile.socialLinks[platform] %>" target="_blank" class="bg-white/20 hover:bg-white/30 p-3 rounded-full transition">
+                                    <i class="fab fa-<%= platform %>"></i>
+                                </a>
+                                <% } %>
+                            <% }) %>
+                        <% } %>
+                    </div>
+                </div>
+            </section>
+            <% } %>
+
+            <% if (section.type === 'about') { %>
+            <section class="section-padding animate-fade-in bg-gray-50 dark:bg-gray-800">
+                <div class="max-w-4xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-8">About Me</h2>
+                    <div class="prose dark:prose-invert max-w-none text-center">
+                        <%- section.content.bio || '<p>Hi there! I\'m passionate about creating amazing digital experiences.</p>' %>
+                    </div>
+                </div>
+            </section>
+            <% } %>
+
+            <% if (section.type === 'projects') { %>
+            <section class="section-padding animate-fade-in">
+                <div class="max-w-6xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">My Projects</h2>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <% (section.content.items || []).forEach(project => { %>
+                        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition">
+                            <% if (project.image) { %>
+                            <img src="<%= project.image %>" alt="<%= project.title %>" class="w-full h-48 object-cover">
+                            <% } else { %>
+                            <div class="w-full h-48 bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                                <i class="fas fa-code text-white text-4xl"></i>
+                            </div>
+                            <% } %>
+                            <div class="p-6">
+                                <h3 class="text-xl font-semibold mb-2"><%= project.title || 'Project Title' %></h3>
+                                <p class="text-gray-600 dark:text-gray-300 mb-4"><%= project.description || 'Project description...' %></p>
+                                <div class="flex space-x-4">
+                                    <% if (project.demoUrl) { %>
+                                    <a href="<%= project.demoUrl %>" target="_blank" class="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition">Demo</a>
+                                    <% } %>
+                                    <% if (project.githubUrl) { %>
+                                    <a href="<%= project.githubUrl %>" target="_blank" class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition">GitHub</a>
+                                    <% } %>
+                                </div>
+                            </div>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </section>
+            <% } %>
+
+            <% if (section.type === 'skills') { %>
+            <section class="section-padding animate-fade-in bg-gray-50 dark:bg-gray-800">
+                <div class="max-w-4xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Skills & Technologies</h2>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <% (section.content.skills || []).forEach(skill => { %>
+                        <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-4 py-2 rounded-full font-medium"><%= skill %></span>
+                        <% }) %>
+                    </div>
+                </div>
+            </section>
+            <% } %>
+
+            <% if (section.type === 'services') { %>
+            <section class="section-padding animate-fade-in">
+                <div class="max-w-6xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Services</h2>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                        <% (section.content.services || []).forEach(service => { %>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition">
+                            <i class="fas fa-<%= service.icon || 'briefcase' %> text-4xl text-indigo-600 mb-4"></i>
+                            <h3 class="text-xl font-semibold mb-2"><%= service.title || 'Service Title' %></h3>
+                            <p class="text-gray-600 dark:text-gray-300"><%= service.description || 'Service description...' %></p>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </section>
+            <% } %>
+
+            <% if (section.type === 'gallery') { %>
+            <section class="section-padding animate-fade-in bg-gray-50 dark:bg-gray-800">
+                <div class="max-w-6xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Gallery</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        <% (section.content.images || []).forEach(image => { %>
+                        <div class="aspect-square overflow-hidden rounded-lg">
+                            <img src="<%= image.url %>" alt="<%= image.alt || 'Gallery image' %>" class="w-full h-full object-cover hover:scale-105 transition">
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </section>
+            <% } %>
+
+            <% if (section.type === 'testimonials') { %>
+            <section class="section-padding animate-fade-in">
+                <div class="max-w-4xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-12">Testimonials</h2>
+                    <div class="grid md:grid-cols-2 gap-8">
+                        <% (section.content.items || []).forEach(testimonial => { %>
+                        <div class="bg-white dark:bg-gray-800 p-6 rounded-lg shadow-lg">
+                            <div class="flex items-center mb-4">
+                                <% if (testimonial.avatar) { %>
+                                <img src="<%= testimonial.avatar %>" alt="<%= testimonial.name %>" class="w-12 h-12 rounded-full mr-4">
+                                <% } else { %>
+                                <div class="w-12 h-12 bg-indigo-600 rounded-full flex items-center justify-center mr-4">
+                                    <span class="text-white font-bold"><%= (testimonial.name || 'A')[0] %></span>
+                                </div>
+                                <% } %>
+                                <div>
+                                    <h4 class="font-semibold"><%= testimonial.name || 'Client Name' %></h4>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm"><%= testimonial.position || 'Position' %></p>
+                                </div>
+                            </div>
+                            <p class="text-gray-600 dark:text-gray-300 italic">"<%= testimonial.message || 'Great work!' %>"</p>
+                        </div>
+                        <% }) %>
+                    </div>
+                </div>
+            </section>
+            <% } %>
+
+            <% if (section.type === 'contact') { %>
+            <section class="section-padding animate-fade-in bg-gray-50 dark:bg-gray-800">
+                <div class="max-w-2xl mx-auto px-4">
+                    <h2 class="text-3xl font-bold text-center mb-8">Get In Touch</h2>
+                    <% if (profile.contactFormEnabled) { %>
+                    <form action="/<%= profile.username %>/contact" method="POST" class="bg-white dark:bg-gray-900 p-6 rounded-lg shadow-lg">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="grid md:grid-cols-2 gap-4 mb-4">
+                            <input type="text" name="name" placeholder="Your Name" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                            <input type="email" name="email" placeholder="Your Email" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        </div>
+                        <textarea name="message" rows="5" placeholder="Your Message" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></textarea>
+                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition mt-4">Send Message</button>
+                    </form>
+                    <% } else { %>
+                    <div class="text-center">
+                        <p class="text-gray-600 dark:text-gray-300 mb-4">Contact form is disabled. Reach out via social media or email.</p>
+                        <% if (profile.socialLinks) { %>
+                        <div class="flex justify-center space-x-4">
+                            <% Object.keys(profile.socialLinks).forEach(platform => { %>
+                                <% if (profile.socialLinks[platform]) { %>
+                                <a href="<%= profile.socialLinks[platform] %>" target="_blank" class="bg-indigo-600 text-white p-3 rounded-full hover:bg-indigo-700 transition">
+                                    <i class="fab fa-<%= platform %>"></i>
+                                </a>
+                                <% } %>
+                            <% }) %>
+                        </div>
+                        <% } %>
+                    </div>
+                    <% } %>
+                </div>
+            </section>
+            <% } %>
+
+            <% if (section.type === 'text') { %>
+            <section class="section-padding animate-fade-in">
+                <div class="max-w-4xl mx-auto px-4">
+                    <div class="prose dark:prose-invert max-w-none <%= section.content.alignment || 'text-left' %> <%= section.content.fontSize || 'text-base' %>">
+                        <%- section.content.html || '<p>Custom text content...</p>' %>
+                    </div>
+                </div>
+            </section>
+            <% } %>
+
+            <% if (section.type === 'button') { %>
+            <section class="section-padding animate-fade-in">
+                <div class="text-center">
+                    <a href="<%= section.content.url || '#' %>" target="_blank"
+                       style="background-color: <%= section.content.bgColor || '#4f46e5' %>; color: <%= section.content.textColor || '#ffffff' %>; padding: <%= section.content.padding || '12px 24px' %>; border-radius: <%= section.content.borderRadius || 8 %>px; border: <%= section.content.border || 'none' %>; font-size: <%= section.content.fontSize || 16 %>px; text-decoration: none; display: inline-block;"
+                       class="hover:opacity-90 transition">
+                        <%= section.content.text || 'Click Me' %>
+                    </a>
+                </div>
+            </section>
+            <% } %>
+        <% }) %>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <p>&copy; <%= new Date().getFullYear() %> <%= user.name %>. All rights reserved.</p>
+            <% if (!profile.showBranding) { %>
+            <p class="text-sm text-gray-400 mt-2">Powered by DropLaunch</p>
+            <% } %>
+        </div>
+    </footer>
+
+    <!-- Alpine.js -->
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</body>
+</html>

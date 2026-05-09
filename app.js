@@ -4,6 +4,7 @@ const session = require('express-session');
 const flash = require('connect-flash');
 const path = require('path');
 const cookieParser = require('cookie-parser');
+const passport = require('passport');
 const loadUser = require('./src/middleware/loadUser');
 const loadSiteSettings = require('./src/middleware/siteSettings');
 const csrfProtection = require('./src/middleware/csrf');
@@ -32,6 +33,13 @@ app.use(session({
     httpOnly: true,
   },
 }));
+
+// Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// Initialize OAuth strategies
+require('./src/controllers/auth/oauthController');
 
 // Flash messages
 app.use(flash());

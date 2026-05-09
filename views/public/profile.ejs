@@ -5,12 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><%= profile.metaTitle || (user.name + ' | DropLaunch') %></title>
     <meta name="description" content="<%= profile.metaDescription || profile.bio || '' %>">
-    <meta property="og:title" content="<%= profile.metaTitle || user.name %>">
-    <meta property="og:description" content="<%= profile.metaDescription || profile.bio || '' %>">
+    <meta property="og:title" content="<%= profile.ogTitle || profile.metaTitle || user.name %>">
+    <meta property="og:description" content="<%= profile.ogDescription || profile.metaDescription || profile.bio || '' %>">
     <% if (profile.ogImage) { %><meta property="og:image" content="/uploads/<%= profile.ogImage %>"><% } %>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="<%= appUrl %>/<%= profile.username %>">
+
+    <!-- Integrations -->
+    <% if (user.isPremiumUser && profile.integrations) { %>
+    <% if (profile.integrations.google_analytics) { %>
+    <!-- Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=<%= profile.integrations.google_analytics %>"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', '<%= profile.integrations.google_analytics %>');
+    </script>
+    <% } %>
+    <% if (profile.integrations.facebook_pixel) { %>
+    <!-- Facebook Pixel Code -->
+    <script>
+      !function(f,b,e,v,n,t,s)
+      {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+      n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+      if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+      n.queue=[];t=b.createElement(e);t.async=!0;
+      t.src=v;s=b.getElementsByTagName(e)[0];
+      s.parentNode.insertBefore(t,s)}(window, document,'script',
+      'https://connect.facebook.net/en_US/fbevents.js');
+      fbq('init', '<%= profile.integrations.facebook_pixel %>');
+      fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+      src="https://www.facebook.com/tr?id=<%= profile.integrations.facebook_pixel %>&ev=PageView&noscript=1"
+    /></noscript>
+    <% } %>
+    <% if (profile.integrations.twitter_pixel) { %>
+    <!-- Twitter Pixel Code -->
+    <script>
+      !function(e,t,n,s,u,a){e.twq||(s=e.twq=function(){s.exe?s.exe.apply(s,arguments):s.queue.push(arguments);
+      },s.version='1.1',s.queue=[],u=t.createElement(n),u.async=!0,u.src='https://static.ads-twitter.com/uwt.js',
+      a=t.getElementsByTagName(n)[0],a.parentNode.insertBefore(u,a))}(window,document,'script');
+      twq('config','<%= profile.integrations.twitter_pixel %>');
+    </script>
+    <% } %>
+    <% if (profile.integrations.custom_css) { %>
+    <style><%= profile.integrations.custom_css %></style>
+    <% } %>
+    <% } %>
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <%- include('../layouts/partials/global-styles') %>
     <% const premiumThemeSlugs = ['dark', 'default', 'gradient', 'bold', 'minimal', 'ocean', 'sunset', 'forest', 'developers', 'web-designers', 'graphic-designers', 'ui-ux-designers', 'video-editors', 'content-creators', 'freelancers', 'digital-marketers', 'social-media-managers', 'photographers', 'videographers', 'animators', 'bloggers', 'writers', 'copywriters', 'seo-experts', 'app-developers', 'software-engineers', 'students', 'teachers', 'artists', 'musicians', 'streamers', 'influencers', 'entrepreneurs', 'business-owners', 'agencies', 'consultants', 'architects', 'fashion-designers', 'resume-builders', 'personal-brands', 'gamers', 'podcasters', 'public-speakers', 'virtual-assistants', 'e-commerce-sellers', 'trainers-coaches', 'crypto-traders', 'ai-creators', 'cyber-security-experts', 'wordpress-developers', 'shopify-experts', 'saas-founders', 'startup-teams']; const premiumThemeActive = premiumThemeSlugs.includes(profile.theme) || profile.backgroundImage; %>
     <style>
         .theme-default { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; }
@@ -102,9 +150,9 @@
         .theme-sunset .profile-card { background: rgba(17, 24, 39, 0.72); border-color: rgba(251, 146, 60, 0.24); box-shadow: 0 30px 90px rgba(251, 146, 60, 0.16); }
         .theme-forest .profile-card { background: rgba(6, 78, 59, 0.82); border-color: rgba(132, 204, 22, 0.22); box-shadow: 0 30px 90px rgba(132, 204, 22, 0.14); }
 
-        .profile-card { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); backdrop-filter: blur(18px); }
-        .profile-card-light { background: rgba(255,255,255,0.8); border: 1px solid rgba(15,23,42,0.08); }
-        .profile-link { transition: transform .2s ease, background-color .2s ease; }
+        .profile-card { background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.18); backdrop-filter: blur(14px); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12); border-radius: 1rem; }
+        .profile-card-light { background: rgba(255,255,255,0.8); border: 1px solid rgba(15,23,42,0.08); box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08); border-radius: 1rem; }
+        .profile-link { transition: transform .2s ease, background-color .2s ease; border-radius: 1rem; padding: 0.65rem 1.15rem; }
         .profile-link:hover { transform: translateY(-2px); }
     </style>
 </head>
@@ -162,6 +210,15 @@
             </div>
             <% } %>
 
+            <!-- Portfolio Link -->
+            <% if (profile.portfolioData && profile.portfolioData.sections && profile.portfolioData.sections.length > 0) { %>
+            <div class="mt-6">
+                <a href="/<%= profile.username %>/portfolio" target="_blank" class="inline-flex items-center px-6 py-3 bg-gradient-to-r from-indigo-500 to-purple-600 text-white font-semibold rounded-full hover:from-indigo-600 hover:to-purple-700 transition shadow-lg">
+                    <i class="fas fa-palette mr-2"></i>View My Portfolio
+                </a>
+            </div>
+            <% } %>
+
             <!-- Spotlight CTA -->
             <% if (profile.spotlightLabel && profile.spotlightUrl) { %>
             <div class="mt-6">
@@ -176,7 +233,7 @@
             <% if (links.length > 0) { %>
             <div class="mt-8 space-y-3">
                 <% links.forEach(link => { %>
-                <a href="/click/<%= link.id %>" class="profile-link block w-full py-3 px-6 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/20 transition text-center <%= premiumThemeActive ? 'text-white' : 'text-gray-900 border-gray-300' %>">
+                <a href="/click/<%= link.id %>" class="profile-link block w-full py-2.5 px-5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl hover:bg-white/20 transition text-center <%= premiumThemeActive ? 'text-white' : 'text-gray-900 border-gray-300' %>">
                     <% if (link.icon) { %>
                     <i class="<%= ['github','linkedin','twitter','instagram','youtube','facebook','tiktok'].includes(link.icon) ? 'fab' : 'fas' %> fa-<%= link.icon %> mr-2"></i>
                     <% } %>
@@ -308,7 +365,28 @@
                 </a>
             </div>
             <% } %>
+
+            <!-- Custom Footer -->
+            <% if (user.isPremiumUser && profile.footer) { %>
+            <div class="mt-8 pt-8 border-t <%= premiumThemeActive ? 'border-white/20' : 'border-gray-200' %>">
+                <% if (profile.footer.text) { %>
+                <p class="text-sm <%= premiumThemeActive ? 'text-white/60' : 'text-gray-500' %> mb-4"><%= profile.footer.text %></p>
+                <% } %>
+                <% if (profile.footer.links && profile.footer.links.length > 0) { %>
+                <div class="flex flex-wrap gap-4">
+                    <% profile.footer.links.forEach(function(link) { %>
+                    <a href="<%= link.url %>" class="text-sm <%= premiumThemeActive ? 'text-white/60 hover:text-white/80' : 'text-gray-500 hover:text-gray-700' %> transition"><%= link.text %></a>
+                    <% }) %>
+                </div>
+                <% } %>
+            </div>
+            <% } %>
         </div>
     </div>
+
+    <!-- Custom JavaScript -->
+    <% if (user.isPremiumUser && profile.integrations && profile.integrations.custom_js) { %>
+    <script><%= profile.integrations.custom_js %></script>
+    <% } %>
 </body>
 </html>

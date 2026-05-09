@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <meta name="description" content="<%= profile.bio || '' %>">
+    <meta property="og:title" content="<%= page.title %>">
+    <meta property="og:description" content="<%= profile.bio || '' %>">
+    <% if (profile.ogImage) { %><meta property="og:image" content="/uploads/<%= profile.ogImage %>"><% } %>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <%- include('../layouts/partials/global-styles') %>
+    <% const premiumThemeSlugs = ['dark', 'default', 'gradient', 'bold', 'minimal', 'ocean', 'sunset', 'forest', 'developers', 'web-designers', 'graphic-designers', 'ui-ux-designers', 'video-editors', 'content-creators', 'freelancers', 'digital-marketers', 'social-media-managers', 'photographers', 'videographers', 'animators', 'bloggers', 'writers', 'copywriters', 'seo-experts', 'app-developers', 'software-engineers', 'students', 'teachers', 'artists', 'musicians', 'streamers', 'influencers', 'entrepreneurs', 'business-owners', 'agencies', 'consultants', 'architects', 'fashion-designers', 'resume-builders', 'personal-brands', 'gamers', 'podcasters', 'public-speakers', 'virtual-assistants', 'e-commerce-sellers', 'trainers-coaches', 'crypto-traders', 'ai-creators', 'cyber-security-experts', 'wordpress-developers', 'shopify-experts', 'saas-founders', 'startup-teams']; const premiumThemeActive = premiumThemeSlugs.includes(profile.theme) || profile.backgroundImage; %>
+    <style>
+        .theme-default { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #ffffff; }
+        .theme-dark { background: linear-gradient(135deg, #111827 0%, #1f2937 100%); color: #e5e7eb; }
+        .theme-gradient { background: radial-gradient(circle at top left, #8b5cf6 0%, #ec4899 35%, #f472b6 100%); color: #ffffff; }
+        .theme-bold { background: radial-gradient(circle at top, #1f0a0a 0%, #c0262d 45%, #f97316 100%); color: #ffffff; }
+        .theme-ocean { background: radial-gradient(circle at top left, #0f172a 0%, #0369a1 40%, #38bdf8 100%); color: #e0f2fe; }
+        .theme-sunset { background: radial-gradient(circle at top, #f97316 0%, #ec4899 35%, #7c3aed 100%); color: #ffffff; }
+        .theme-forest { background: linear-gradient(135deg, #064e3b 0%, #15803d 45%, #4d7c0f 100%); color: #ecfccb; }
+        .theme-minimal { background: #f8fafc; color: #111827; }
+        .theme-developers { background: linear-gradient(135deg, #0f172a 0%, #0369a1 100%); color: #e0f2fe; }
+        .theme-web-designers { background: linear-gradient(135deg, #7c3aed 0%, #ec4899 60%, #fbbf24 100%); color: #ffffff; }
+        .theme-graphic-designers { background: linear-gradient(135deg, #d946ef 0%, #f97316 55%, #f43f5e 100%); color: #ffffff; }
+        .theme-ui-ux-designers { background: linear-gradient(135deg, #111827 0%, #4338ca 45%, #8b5cf6 100%); color: #f8fafc; }
+        .theme-video-editors { background: linear-gradient(135deg, #0f172a 0%, #0ea5e9 45%, #38bdf8 100%); color: #ffffff; }
+        .theme-content-creators { background: linear-gradient(135deg, #fb7185 0%, #f97316 55%, #facc15 100%); color: #111827; }
+        .theme-freelancers { background: linear-gradient(135deg, #1f2937 0%, #475569 50%, #f59e0b 100%); color: #f8fafc; }
+        .theme-digital-marketers { background: linear-gradient(135deg, #1d4ed8 0%, #9333ea 45%, #ec4899 100%); color: #ffffff; }
+        .theme-social-media-managers { background: linear-gradient(135deg, #f97316 0%, #e11d48 45%, #8b5cf6 100%); color: #ffffff; }
+        .theme-photographers { background: linear-gradient(135deg, #0f172a 0%, #475569 40%, #f8fafc 100%); color: #111827; }
+        .theme-videographers { background: linear-gradient(135deg, #0f172a 0%, #0ea5e9 50%, #0284c7 100%); color: #ffffff; }
+        .theme-animators { background: linear-gradient(135deg, #7c3aed 0%, #f472b6 45%, #fb7185 100%); color: #ffffff; }
+        .theme-bloggers { background: linear-gradient(135deg, #f8fafc 0%, #fb923c 45%, #f97316 100%); color: #111827; }
+        .theme-writers { background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 50%, #111827 100%); color: #111827; }
+        .theme-copywriters { background: linear-gradient(135deg, #111827 0%, #f59e0b 55%, #fde68a 100%); color: #111827; }
+        .theme-seo-experts { background: linear-gradient(135deg, #0f172a 0%, #22c55e 55%, #bef264 100%); color: #ffffff; }
+        .theme-app-developers { background: linear-gradient(135deg, #0f172a 0%, #38bdf8 55%, #60a5fa 100%); color: #ffffff; }
+        .theme-software-engineers { background: linear-gradient(135deg, #111827 0%, #334155 45%, #0ea5e9 100%); color: #ffffff; }
+        .theme-students { background: linear-gradient(135deg, #2563eb 0%, #22d3ee 60%, #e0f2fe 100%); color: #0f172a; }
+        .theme-teachers { background: linear-gradient(135deg, #166534 0%, #4ade80 55%, #ecfccb 100%); color: #0f172a; }
+        .theme-artists { background: linear-gradient(135deg, #9333ea 0%, #f472b6 45%, #facc15 100%); color: #ffffff; }
+        .theme-musicians { background: linear-gradient(135deg, #0f172a 0%, #6366f1 55%, #a855f7 100%); color: #ffffff; }
+        .theme-streamers { background: linear-gradient(135deg, #312e81 0%, #8b5cf6 55%, #f472b6 100%); color: #ffffff; }
+        .theme-influencers { background: linear-gradient(135deg, #be185d 0%, #ec4899 55%, #f9a8d4 100%); color: #111827; }
+        .theme-entrepreneurs { background: linear-gradient(135deg, #0f172a 0%, #1d4ed8 55%, #2563eb 100%); color: #ffffff; }
+        .theme-business-owners { background: linear-gradient(135deg, #1e293b 0%, #475569 45%, #f59e0b 100%); color: #ffffff; }
+    </style>
+</head>
+<body class="min-h-screen theme-<%= profile.theme %>">
+    <div class="min-h-screen flex items-center justify-center p-4">
+        <div class="max-w-4xl w-full">
+            <!-- Header -->
+            <div class="text-center mb-8">
+                <a href="/<%= profile.username %>" class="inline-flex items-center space-x-2 mb-4">
+                    <% if (profile.image) { %>
+                    <img src="/uploads/<%= profile.image %>" alt="<%= user.name %>" class="w-12 h-12 rounded-full object-cover">
+                    <% } else { %>
+                    <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+                        <i class="fas fa-user text-white"></i>
+                    </div>
+                    <% } %>
+                    <div>
+                        <h1 class="text-2xl font-bold"><%= user.name %></h1>
+                        <p class="text-sm opacity-80">@<%= profile.username %></p>
+                    </div>
+                </a>
+                <h2 class="text-xl font-semibold mb-2"><%= page.title %></h2>
+            </div>
+
+            <!-- Page Content -->
+            <div class="bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-xl">
+                <div class="prose prose-lg max-w-none <%= premiumThemeActive ? 'prose-invert' : '' %>">
+                    <%- page.content.replace(/\n/g, '<br>') %>
+                </div>
+            </div>
+
+            <!-- Back to Profile -->
+            <div class="text-center mt-8">
+                <a href="/<%= profile.username %>" class="inline-flex items-center px-6 py-3 bg-white/20 backdrop-blur-sm rounded-xl hover:bg-white/30 transition <%= premiumThemeActive ? 'text-white' : 'text-gray-900' %>">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Profile
+                </a>
+            </div>
+
+            <!-- Branding -->
+            <% if (profile.showBranding) { %>
+            <div class="text-center mt-8">
+                <a href="/" class="<%= premiumThemeActive ? 'text-white/40 hover:text-white/60' : 'text-gray-400 hover:text-gray-600' %> transition text-sm">
+                    Made with <i class="fas fa-rocket mx-1"></i> DropLaunch
+                </a>
+            </div>
+            <% } %>
+        </div>
+    </div>
+</body>
+</html>

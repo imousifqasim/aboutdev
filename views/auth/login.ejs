@@ -8,6 +8,7 @@
     <script>tailwind.config = { darkMode: 'class' }</script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <%- include('../layouts/partials/global-styles') %>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -45,7 +46,28 @@
         <div class="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-600 dark:text-red-400 px-4 py-3 rounded-xl text-sm"><i class="fas fa-exclamation-circle mr-2"></i><%= error[0] %></div>
         <% } %>
 
-        <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-2xl rounded-[2rem] p-8 border border-slate-200/50 dark:border-slate-800/50">
+        <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xl rounded-[1.5rem] p-6 border border-slate-200/50 dark:border-slate-800/50">
+            <!-- OAuth Buttons -->
+            <div class="mb-6 space-y-3">
+                <a href="/auth/google" class="w-full flex items-center justify-center py-3 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition text-sm font-medium">
+                    <i class="fab fa-google text-red-500 mr-3"></i>
+                    Continue with Google
+                </a>
+                <a href="/auth/github" class="w-full flex items-center justify-center py-3 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition text-sm font-medium">
+                    <i class="fab fa-github text-slate-900 dark:text-white mr-3"></i>
+                    Continue with GitHub
+                </a>
+            </div>
+
+            <div class="relative mb-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400">Or continue with email</span>
+                </div>
+            </div>
+
             <form method="POST" action="/login"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="mb-5">
                     <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email</label>
@@ -67,6 +89,9 @@
             </form>
         </div>
         <p class="text-center mt-6 text-sm text-slate-500 dark:text-slate-400">
+            <a href="/forgot-password" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">Forgot your password?</a>
+        </p>
+        <p class="text-center mt-2 text-sm text-slate-500 dark:text-slate-400">
             Don't have an account? <a href="/register" class="text-indigo-600 dark:text-indigo-400 font-semibold hover:underline">Create one</a>
         </p>
     </div>

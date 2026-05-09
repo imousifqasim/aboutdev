@@ -3,6 +3,7 @@ const { isPremium, RESERVED_USERNAMES } = require('../../helpers');
 const { sendMail } = require('../../mail');
 const path = require('path');
 const fs = require('fs');
+const bcrypt = require('bcryptjs');
 
 const industryThemes = [
   'developers', 'web-designers', 'graphic-designers', 'ui-ux-designers', 'video-editors',
@@ -40,7 +41,7 @@ exports.edit = async (req, res) => {
 exports.update = async (req, res) => {
   const user = req.user;
   const profile = user.profile;
-  const { name, username, bio, location, company, website, custom_domain, meta_title, meta_description } = req.body;
+  const { name, username, bio, location, company, website, custom_domain, meta_title, meta_description, og_title, og_description, focus_keyword } = req.body;
 
   if (!name || !username) {
     cleanupFile(req);
@@ -98,6 +99,9 @@ exports.update = async (req, res) => {
     customDomain: customDomain || null,
     metaTitle: meta_title || null,
     metaDescription: meta_description || null,
+    ogTitle: og_title || null,
+    ogDescription: og_description || null,
+    focusKeyword: focus_keyword || null,
   };
 
   if (req.file) {
@@ -118,6 +122,41 @@ exports.update = async (req, res) => {
 
   await prisma.profile.update({ where: { id: profile.id }, data });
   req.flash('success', 'Profile updated successfully!');
+  res.redirect('/dashboard/profile');
+};
+
+exports.updatePassword = async (req, res) => {
+  const { current_password, new_password, confirm_password } = req.body;
+
+  if (!current_password || !new_password || !confirm_password) {
+    req.flash('error', 'All password fields are required.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  if (new_password.length < 6) {
+    req.flash('error', 'New password must be at least 6 characters long.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  if (new_password !== confirm_password) {
+    req.flash('error', 'New password and confirmation do not match.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+
+  if (!(await bcrypt.compare(current_password, user.password))) {
+    req.flash('error', 'Current password is incorrect.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  const hashedPassword = await bcrypt.hash(new_password, 10);
+  await prisma.user.update({
+    where: { id: req.user.id },
+    data: { password: hashedPassword },
+  });
+
+  req.flash('success', 'Password updated successfully!');
   res.redirect('/dashboard/profile');
 };
 
@@ -361,6 +400,116 @@ exports.emailSignature = async (req, res) => {
   user.isPremiumUser = await isPremium(user.id);
   const unreadCount = await prisma.contactMessage.count({ where: { userId: user.id, isRead: false } });
   res.render('user/email-signature', { title: 'Email Signature', user, unreadCount });
+};
+
+exports.updatePages = async (req, res) => {
+  if (!req.user.isPremiumUser) {
+    req.flash('error', 'Pages feature requires premium subscription.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  const { page_title, page_content, page_slug } = req.body;
+  if (!page_title || !page_content) {
+    req.flash('error', 'Page title and content are required.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  const profile = req.user.profile;
+  const pages = profile.pages || [];
+  const slug = page_slug || page_title.toLowerCase().replace(/[^a-z0-9]/g, '-').replace(/-+/g, '-');
+
+  pages.push({
+    id: Date.now().toString(),
+    title: page_title,
+    content: page_content,
+    slug: slug,
+    createdAt: new Date().toISOString()
+  });
+
+  await prisma.profile.update({ where: { id: profile.id }, data: { pages } });
+  req.flash('success', 'Page added successfully!');
+  res.redirect('/dashboard/profile');
+};
+
+exports.removePage = async (req, res) => {
+  const profile = req.user.profile;
+  const pages = profile.pages || [];
+  const pageId = req.params.id;
+
+  const updatedPages = pages.filter(p => p.id !== pageId);
+  await prisma.profile.update({ where: { id: profile.id }, data: { pages: updatedPages } });
+
+  req.flash('success', 'Page removed.');
+  res.redirect('/dashboard/profile');
+};
+
+exports.updateIntegrations = async (req, res) => {
+  if (!req.user.isPremiumUser) {
+    req.flash('error', 'Integrations require premium subscription.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  const integrations = {};
+  const integrationTypes = ['google_analytics', 'facebook_pixel', 'twitter_pixel', 'custom_css', 'custom_js'];
+
+  integrationTypes.forEach(type => {
+    const value = req.body[`integration_${type}`];
+    if (value && value.trim()) {
+      integrations[type] = value.trim();
+    }
+  });
+
+  await prisma.profile.update({
+    where: { id: req.user.profile.id },
+    data: { integrations },
+  });
+
+  req.flash('success', 'Integrations updated successfully!');
+  res.redirect('/dashboard/profile');
+};
+
+exports.updateFooter = async (req, res) => {
+  if (!req.user.isPremiumUser) {
+    req.flash('error', 'Footer customization requires premium subscription.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  const { footer_text, footer_links, footer_show_branding } = req.body;
+
+  const footer = {
+    text: footer_text || '',
+    links: footer_links ? JSON.parse(footer_links) : [],
+    showBranding: footer_show_branding === 'on'
+  };
+
+  await prisma.profile.update({
+    where: { id: req.user.profile.id },
+    data: { footer },
+  });
+
+  req.flash('success', 'Footer updated successfully!');
+  res.redirect('/dashboard/profile');
+};
+
+exports.updateDefaultTheme = async (req, res) => {
+  if (!req.user.isPremiumUser) {
+    req.flash('error', 'Default theme settings require premium subscription.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  const { default_theme } = req.body;
+  if (!validThemes.includes(default_theme)) {
+    req.flash('error', 'Invalid theme selected.');
+    return res.redirect('/dashboard/profile');
+  }
+
+  await prisma.profile.update({
+    where: { id: req.user.profile.id },
+    data: { defaultTheme: default_theme },
+  });
+
+  req.flash('success', 'Default theme updated successfully!');
+  res.redirect('/dashboard/profile');
 };
 
 exports.messages = async (req, res) => {

@@ -112,3 +112,35 @@ exports.sendMessage = async (req, res) => {
 
   res.redirect(`/${username}`);
 };
+
+exports.showPage = async (req, res) => {
+  const { username, pageSlug } = req.params;
+  const profile = await prisma.profile.findUnique({
+    where: { username },
+    include: { user: true },
+  });
+
+  if (!profile || profile.user.isBanned) {
+    return res.status(404).render('layouts/error', { title: '404', message: 'Profile not found.' });
+  }
+
+  const user = profile.user;
+  user.isPremiumUser = await isPremium(user.id);
+
+  // Find the custom page
+  const page = user.isPremiumUser && profile.pages
+    ? profile.pages.find(p => p.slug === pageSlug)
+    : null;
+
+  if (!page) {
+    return res.status(404).render('layouts/error', { title: '404', message: 'Page not found.' });
+  }
+
+  res.render('public/page', {
+    title: `${page.title} | ${user.name}`,
+    profile,
+    user,
+    page,
+    layout: false
+  });
+};

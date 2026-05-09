@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= appName %></title>
+    <%- include('../../layouts/partials/head') %>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <%- include('../../layouts/partials/dashboard-header') %>
+
+    <div class="flex">
+        <%- include('../../layouts/partials/user-sidebar') %>
+
+        <main class="flex-1 p-8">
+            <div class="max-w-6xl mx-auto">
+                <!-- Header -->
+                <div class="mb-8">
+                    <div class="flex items-center space-x-4 mb-4">
+                        <a href="/dashboard/settings" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                            <i class="fas fa-arrow-left"></i>
+                        </a>
+                        <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Media Library</h1>
+                    </div>
+                    <p class="text-gray-600 dark:text-gray-400">Manage your uploaded images and files</p>
+                </div>
+
+                <%- include('../../layouts/partials/flash') %>
+
+                <!-- Storage Stats -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-blue-100 dark:bg-blue-900 rounded-lg">
+                                <i class="fas fa-database text-blue-600 dark:text-blue-400 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Storage Used</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">0 MB / 10 GB</p>
+                            </div>
+                        </div>
+                        <div class="mt-4 w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                            <div class="bg-blue-600 h-2 rounded-full" style="width: 0%"></div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-green-100 dark:bg-green-900 rounded-lg">
+                                <i class="fas fa-image text-green-600 dark:text-green-400 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Images</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                        <div class="flex items-center">
+                            <div class="p-3 bg-purple-100 dark:bg-purple-900 rounded-lg">
+                                <i class="fas fa-file text-purple-600 dark:text-purple-400 text-xl"></i>
+                            </div>
+                            <div class="ml-4">
+                                <p class="text-sm font-medium text-gray-600 dark:text-gray-400">Total Files</p>
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Upload Area -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Upload New Files</h3>
+                    
+                    <div class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-12 text-center cursor-pointer hover:border-indigo-500 transition" onclick="document.getElementById('fileInput').click()">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-gray-400 dark:text-gray-500 mb-4 block"></i>
+                        <p class="text-lg font-medium text-gray-900 dark:text-white mb-2">Drag and drop files here</p>
+                        <p class="text-sm text-gray-600 dark:text-gray-400">or click to select files from your computer</p>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-4">Supported formats: JPG, PNG, GIF, WebP, PDF (Max 25MB each)</p>
+                        <input type="file" id="fileInput" class="hidden" multiple accept="image/*,.pdf">
+                    </div>
+                </div>
+
+                <!-- Media Library -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Your Media</h3>
+                    
+                    <p class="text-gray-600 dark:text-gray-400 text-center py-12">
+                        <i class="fas fa-folder-open text-4xl text-gray-300 dark:text-gray-600 mb-4 block"></i>
+                        Your media library is empty
+                    </p>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
