@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= appName %></title>
+    <%- include('../../layouts/partials/head') %>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <%- include('../../layouts/partials/admin-sidebar') %>
+
+    <div class="ml-64 flex">
+        <%- include('../partials/submenu') %>
+        <div class="flex-1 p-8">
+            <div class="max-w-4xl mx-auto">
+            <!-- Header -->
+            <div class="mb-8">
+                <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Authentication Settings</h1>
+                <p class="text-gray-600 dark:text-gray-400 mt-2">Configure authentication providers and security settings</p>
+            </div>
+
+            <form method="POST" action="/admin/settings/auth" class="space-y-6">
+                <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+
+                <!-- OAuth Providers -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">OAuth Providers</h3>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Google Login</label>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Allow users to sign in with Google</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="google_login_enabled" value="true" <%= settings.google_login_enabled === 'true' ? 'checked' : '' %> class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">GitHub Login</label>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Allow users to sign in with GitHub</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="github_login_enabled" value="true" <%= settings.github_login_enabled === 'true' ? 'checked' : '' %> class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Registration Settings -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Registration Settings</h3>
+
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Allow Registration</label>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Users can create new accounts</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="registration_enabled" value="true" <%= settings.registration_enabled === 'true' ? 'checked' : '' %> class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Email Verification Required</label>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">Users must verify their email before accessing the platform</p>
+                            </div>
+                            <label class="relative inline-flex items-center cursor-pointer">
+                                <input type="checkbox" name="email_verification_required" value="true" <%= settings.email_verification_required === 'true' ? 'checked' : '' %> class="sr-only peer">
+                                <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600"></div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Security Settings -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Security Settings</h3>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Minimum Password Length</label>
+                            <input type="number" name="password_min_length" value="<%= settings.password_min_length || 8 %>" min="6" max="32" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Max Login Attempts</label>
+                            <input type="number" name="login_attempts_max" value="<%= settings.login_attempts_max || 5 %>" min="3" max="20" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        </div>
+
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Session Timeout (hours)</label>
+                            <input type="number" name="session_timeout" value="<%= settings.session_timeout || 24 %>" min="1" max="168" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500 focus:border-transparent">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="flex justify-end">
+                    <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition">
+                        Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

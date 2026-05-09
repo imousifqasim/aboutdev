@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<head><%- include('../../layouts/partials/head') %><title>Messages - <%= appName %></title></head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+<div class="flex min-h-screen">
+    <%- include('../../layouts/partials/user-sidebar') %>
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <%- include('../../layouts/partials/dashboard-header', { title: 'Messages' }) %>
+        <main class="flex-1 overflow-y-auto p-6">
+            <%- include('../../layouts/partials/flash') %>
+            <div class="max-w-4xl">
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-inbox mr-2"></i>Messages
+                        <% if (unreadCount > 0) { %><span class="ml-2 bg-red-500 text-white text-xs px-2 py-0.5 rounded-full"><%= unreadCount %> New</span><% } %>
+                    </h3>
+                    <% if (!user.isPremiumUser) { %>
+                    <p class="text-amber-600 dark:text-amber-400 mb-4"><i class="fas fa-lock mr-1"></i>Contact form requires <a href="/dashboard/payments" class="underline">Premium subscription</a>.</p>
+                    <% } %>
+                    <% if (messages.length === 0) { %>
+                    <div class="text-center py-12 text-gray-500 dark:text-gray-400"><i class="fas fa-inbox text-4xl mb-4 block"></i><p>No messages yet.</p></div>
+                    <% } else { %>
+                    <div class="space-y-3">
+                        <% messages.forEach(function(m) { %>
+                        <div class="p-4 rounded-lg border <%= !m.isRead ? 'bg-indigo-50 dark:bg-indigo-900/20 border-indigo-200 dark:border-indigo-700' : 'bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600' %>">
+                            <div class="flex items-start justify-between">
+                                <div class="flex-1">
+                                    <div class="flex items-center space-x-2">
+                                        <p class="font-semibold"><%= m.senderName %></p>
+                                        <% if (!m.isRead) { %><span class="bg-indigo-500 text-white text-xs px-2 py-0.5 rounded-full">New</span><% } %>
+                                    </div>
+                                    <p class="text-sm text-gray-500 dark:text-gray-400"><%= m.senderEmail %></p>
+                                    <p class="mt-2 text-sm"><%= m.message %></p>
+                                    <p class="mt-2 text-xs text-gray-400"><%= new Date(m.createdAt).toLocaleString() %></p>
+                                </div>
+                                <div class="flex space-x-2 ml-4">
+                                    <% if (!m.isRead) { %>
+                                    <form method="POST" action="/dashboard/messages/<%= m.id %>/read"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="px-3 py-1 bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-400 rounded text-sm"><i class="fas fa-check"></i></button></form>
+                                    <% } %>
+                                    <form method="POST" action="/dashboard/messages/<%= m.id %>/delete" onsubmit="return confirm('Delete this message?')"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="px-3 py-1 bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-400 rounded text-sm"><i class="fas fa-trash"></i></button></form>
+                                </div>
+                            </div>
+                            <details class="mt-4 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-4">
+                                <summary class="cursor-pointer font-medium text-indigo-600 dark:text-indigo-300">Reply to <%= m.senderName %></summary>
+                                <form method="POST" action="/dashboard/messages/<%= m.id %>/reply" class="mt-4 space-y-3">
+                                    <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                    <textarea name="reply_message" rows="4" required class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100" placeholder="Write your reply here..."></textarea>
+                                    <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Send Reply</button>
+                                </form>
+                            </details>
+                        </div>
+                        <% }) %>
+                    </div>
+                    <% } %>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

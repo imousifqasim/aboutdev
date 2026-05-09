@@ -1,0 +1,27 @@
+<% const currentPath = typeof req !== 'undefined' ? req.path : ''; %>
+<a href="/dashboard" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+    <i class="fas fa-tachometer-alt w-5 mr-3"></i>Dashboard
+</a>
+<a href="/dashboard/profile" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+    <i class="fas fa-user w-5 mr-3"></i>Profile
+</a>
+<a href="/dashboard/links" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+    <i class="fas fa-link w-5 mr-3"></i>Links
+</a>
+<a href="/dashboard/email-signature" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+    <i class="fas fa-envelope w-5 mr-3"></i>Email Signature
+</a>
+<a href="/dashboard/messages" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+    <i class="fas fa-inbox w-5 mr-3"></i>Messages
+    <% if (typeof unreadCount !== 'undefined' && unreadCount > 0) { %>
+    <span class="ml-auto bg-red-500 text-white text-xs px-2 py-0.5 rounded-full"><%= unreadCount %></span>
+    <% } %>
+</a>
+<a href="/dashboard/payments" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-300">
+    <i class="fas fa-credit-card w-5 mr-3"></i>Subscription
+</a>
+<% if (user && user.profile) { %>
+<a href="/<%= user.profile.username %>" target="_blank" class="flex items-center px-3 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 text-indigo-600 dark:text-indigo-400">
+    <i class="fas fa-external-link-alt w-5 mr-3"></i>View Profile
+</a>
+<% } %>

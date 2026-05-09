@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= appName %></title>
+    <%- include('../../layouts/partials/head') %>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <%- include('../../layouts/partials/dashboard-header') %>
+
+    <div class="flex">
+        <%- include('../../layouts/partials/user-sidebar') %>
+
+        <main class="flex-1 flex">
+            <!-- Settings Submenu -->
+            <%- include('./partials/submenu') %>
+
+            <!-- Settings Content -->
+            <div class="flex-1 p-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Notifications</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">Manage how you receive notifications</p>
+                </div>
+
+                <%- include('../../layouts/partials/flash') %>
+
+                <!-- Email Notifications -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Email Notifications</h3>
+                    
+                    <form method="POST" action="/dashboard/settings/notifications" class="space-y-4">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Portfolio Updates</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">When someone views or interacts with your portfolio</p>
+                            </div>
+                            <input type="checkbox" name="emailPortfolioUpdates" class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">New Messages</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">When you receive new messages from visitors</p>
+                            </div>
+                            <input type="checkbox" name="emailMessages" checked class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Comments</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">When someone comments on your portfolio or posts</p>
+                            </div>
+                            <input type="checkbox" name="emailComments" class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">New Followers</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">When someone follows your portfolio</p>
+                            </div>
+                            <input type="checkbox" name="emailFollowers" class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Subscription & Billing</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Important updates about your subscription and payments</p>
+                            </div>
+                            <input type="checkbox" name="emailBilling" checked class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Product Updates</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">New features, improvements, and announcements</p>
+                            </div>
+                            <input type="checkbox" name="emailUpdates" class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition">
+                            Save Preferences
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Push Notifications -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Push Notifications</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Enable push notifications</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Get instant notifications on your device</p>
+                            </div>
+                            <input type="checkbox" name="enablePush" class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Frequency -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Notification Frequency</h3>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Email digest frequency</label>
+                            <select class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-indigo-500">
+                                <option>Real-time notifications</option>
+                                <option>Daily digest</option>
+                                <option>Weekly digest</option>
+                                <option>Never</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<head><%- include('../../layouts/partials/head') %><title>Edit Profile - <%= appName %></title></head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+<div class="flex min-h-screen">
+    <%- include('../../layouts/partials/user-sidebar') %>
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <%- include('../../layouts/partials/dashboard-header', { title: 'Edit Profile' }) %>
+        <main class="flex-1 overflow-y-auto p-6">
+            <%- include('../../layouts/partials/flash') %>
+            <div class="max-w-4xl space-y-6">
+                <!-- Basic Info -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-user mr-2"></i>Basic Information</h3>
+                    <form method="POST" action="/dashboard/profile" enctype="multipart/form-data" class="space-y-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Name</label><input type="text" name="name" value="<%= user.name %>" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                            <div><label class="block text-sm font-medium mb-1">Username</label>
+                                <div class="flex"><span class="px-3 py-2 bg-gray-100 dark:bg-gray-600 border border-r-0 border-gray-300 dark:border-gray-600 rounded-l-lg text-sm text-gray-500">droplaunch.dev/</span><input type="text" name="username" value="<%= user.profile ? user.profile.username : '' %>" required class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-r-lg bg-white dark:bg-gray-700"></div>
+                            </div>
+                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Bio</label><textarea name="bio" rows="3" maxlength="1000" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"><%= user.profile && user.profile.bio ? user.profile.bio : '' %></textarea></div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Location</label><input type="text" name="location" value="<%= user.profile && user.profile.location ? user.profile.location : '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                            <div><label class="block text-sm font-medium mb-1">Company</label><input type="text" name="company" value="<%= user.profile && user.profile.company ? user.profile.company : '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Website</label><input type="url" name="website" value="<%= user.profile && user.profile.website ? user.profile.website : '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        <div><label class="block text-sm font-medium mb-1">Custom Domain</label><input type="text" name="custom_domain" value="<%= user.profile && user.profile.customDomain ? user.profile.customDomain : '' %>" placeholder="yourdomain.com" <%= !user.isPremiumUser ? 'disabled' : '' %> class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        <% if (!user.isPremiumUser) { %>
+                        <p class="text-xs text-amber-600 dark:text-amber-400">Custom domain is available on premium plans only.</p>
+                        <% } else { %>
+                        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 text-sm text-gray-600 dark:text-gray-300">
+                            <p class="font-medium mb-2">DNS Setup Instructions</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Enter the domain you own, such as <span class="font-mono">example.com</span> or <span class="font-mono">www.example.com</span>.</li>
+                                <li>For a subdomain, add a <strong>CNAME</strong> record pointing to <span class="font-mono"><%= siteSettings && siteSettings.customDomainTarget ? siteSettings.customDomainTarget : appUrl.replace(/^https?:\/\//, '') %></span>.</li>
+                                <li>For a root domain, add an <strong>A</strong> record pointing to your app server IP address.</li>
+                                <li>Wait up to 24 hours for DNS propagation, then refresh your profile.</li>
+                            </ul>
+                            <p class="mt-2 text-xs text-gray-500 dark:text-gray-400">If you do not have the server IP, ask your hosting provider or use a CNAME for a subdomain.</p>
+                        </div>
+                        <% } %>
+                        <div><label class="block text-sm font-medium mb-1">Profile Image</label>
+                            <% if (user.profile && user.profile.image) { %>
+                            <div class="mb-3"><img src="/uploads/<%= user.profile.image %>" alt="Current profile image" class="w-20 h-20 rounded-full object-cover border-2 border-gray-200 dark:border-gray-600"></div>
+                            <% } %>
+                            <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Upload a new profile image (JPG, PNG, GIF, WebP). Max 5MB.</p>
+                        </div>
+                        <h4 class="font-medium mt-4">Social Links</h4>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <% ['twitter','instagram','facebook','linkedin','github','youtube','tiktok'].forEach(function(p) { %>
+                            <div><label class="block text-sm font-medium mb-1 capitalize"><%= p %></label><input type="url" name="social_<%= p %>" value="<%= user.profile && user.profile.socialLinks && user.profile.socialLinks[p] ? user.profile.socialLinks[p] : '' %>" placeholder="https://<%= p %>.com/..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                            <% }) %>
+                        </div>
+                        <h4 class="font-medium mt-4">SEO Settings</h4>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Meta Title</label>
+                                <input type="text" name="meta_title" maxlength="60" value="<%= user.profile && user.profile.metaTitle ? user.profile.metaTitle : '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Recommended 50–60 characters.</p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Meta Description</label>
+                                <textarea name="meta_description" rows="3" maxlength="160" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"><%= user.profile && user.profile.metaDescription ? user.profile.metaDescription : '' %></textarea>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Recommended 150–160 characters.</p>
+                            </div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">OG Title</label>
+                                <input type="text" name="og_title" value="<%= user.profile && user.profile.ogTitle ? user.profile.ogTitle : '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">OG Description</label>
+                                <textarea name="og_description" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"><%= user.profile && user.profile.ogDescription ? user.profile.ogDescription : '' %></textarea>
+                            </div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Focus Keyword</label>
+                                <input type="text" name="focus_keyword" value="<%= user.profile && user.profile.focusKeyword ? user.profile.focusKeyword : '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">SEO Friendly URL</label>
+                                <input type="text" name="username" value="<%= user.profile ? user.profile.username : '' %>" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Change your URL slug to a SEO friendly address.</p>
+                            </div>
+                        </div>
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-save mr-2"></i>Save Profile</button>
+                    </form>
+                </div>
+
+                <!-- Account Password Manager -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-lock mr-2"></i>Account Password Manager</h3>
+                    <form method="POST" action="/dashboard/profile/password" class="space-y-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Current Password</label>
+                            <input type="password" name="current_password" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">New Password</label>
+                            <input type="password" name="new_password" required minlength="6" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Confirm New Password</label>
+                            <input type="password" name="confirm_password" required minlength="6" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                        </div>
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-save mr-2"></i>Update Password</button>
+                    </form>
+                </div>
+
+                <!-- Theme -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-palette mr-2"></i>Theme</h3>
+                    <form method="POST" action="/dashboard/profile/theme"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <% var themes = [
+                                {id:'default',name:'Default',colors:'bg-white border-2 border-gray-300',text:'text-gray-700'},
+                                {id:'dark',name:'Dark',colors:'bg-gray-800 border-2 border-gray-600',text:'text-white'},
+                                {id:'minimal',name:'Minimal',colors:'bg-gray-100 border-2 border-gray-200',text:'text-gray-700'},
+                                {id:'gradient',name:'Gradient',colors:'bg-gradient-to-br from-violet-600 via-fuchsia-600 to-pink-500 shadow-xl',text:'text-white',premium:true},
+                                {id:'bold',name:'Bold',colors:'bg-gradient-to-br from-rose-800 via-red-700 to-orange-500 shadow-xl',text:'text-white',premium:true},
+                                {id:'ocean',name:'Ocean',colors:'bg-gradient-to-br from-slate-900 via-cyan-600 to-teal-400 shadow-xl',text:'text-white',premium:true},
+                                {id:'sunset',name:'Sunset',colors:'bg-gradient-to-br from-orange-500 via-rose-500 to-fuchsia-500 shadow-xl',text:'text-white',premium:true},
+                                {id:'forest',name:'Forest',colors:'bg-gradient-to-br from-emerald-900 via-lime-600 to-emerald-500 shadow-xl',text:'text-white',premium:true}
+                            ];
+                            var industryThemes = [
+                                {id:'developers',name:'Developers'},{id:'web-designers',name:'Web Designers'},{id:'graphic-designers',name:'Graphic Designers'},{id:'ui-ux-designers',name:'UI/UX Designers'},{id:'video-editors',name:'Video Editors'},{id:'content-creators',name:'Content Creators'},{id:'freelancers',name:'Freelancers'},{id:'digital-marketers',name:'Digital Marketers'},{id:'social-media-managers',name:'Social Media Managers'},{id:'photographers',name:'Photographers'},{id:'videographers',name:'Videographers'},{id:'animators',name:'Animators'},{id:'bloggers',name:'Bloggers'},{id:'writers',name:'Writers'},{id:'copywriters',name:'Copywriters'},{id:'seo-experts',name:'SEO Experts'},{id:'app-developers',name:'App Developers'},{id:'software-engineers',name:'Software Engineers'},{id:'students',name:'Students'},{id:'teachers',name:'Teachers'},{id:'artists',name:'Artists'},{id:'musicians',name:'Musicians'},{id:'streamers',name:'Streamers'},{id:'influencers',name:'Influencers'},{id:'entrepreneurs',name:'Entrepreneurs'},{id:'business-owners',name:'Business Owners'},{id:'agencies',name:'Agencies'},{id:'consultants',name:'Consultants'},{id:'architects',name:'Architects'},{id:'fashion-designers',name:'Fashion Designers'},{id:'resume-builders',name:'Resume Builders'},{id:'personal-brands',name:'Personal Brands'},{id:'gamers',name:'Gamers'},{id:'podcasters',name:'Podcasters'},{id:'public-speakers',name:'Public Speakers'},{id:'virtual-assistants',name:'Virtual Assistants'},{id:'e-commerce-sellers',name:'E-commerce Sellers'},{id:'trainers-coaches',name:'Trainers & Coaches'},{id:'crypto-traders',name:'Crypto Traders'},{id:'ai-creators',name:'AI Creators'},{id:'cyber-security-experts',name:'Cyber Security Experts'},{id:'wordpress-developers',name:'WordPress Developers'},{id:'shopify-experts',name:'Shopify Experts'},{id:'saas-founders',name:'SaaS Founders'},{id:'startup-teams',name:'Startup Teams'}
+                            ]; %>
+                            <% themes.forEach(function(t) { %>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="theme" value="<%= t.id %>" <%= user.profile && user.profile.theme === t.id ? 'checked' : '' %> class="sr-only peer">
+                                <div class="h-24 rounded-lg overflow-hidden border-2 border-transparent <%= t.colors %> peer-checked:border-indigo-500 peer-checked:ring-2 peer-checked:ring-indigo-500 peer-checked:ring-offset-2 peer-checked:ring-offset-white dark:peer-checked:ring-offset-gray-800 flex items-end justify-between p-2 transition-all duration-200 shadow-lg hover:-translate-y-0.5 <%= t.premium ? 'border-yellow-300 shadow-yellow-400/20' : '' %>">
+                                    <span class="text-xs font-medium <%= t.text %>"><%= t.name %></span>
+                                    <% if (t.premium) { %><span class="ml-2 inline-flex items-center rounded-full bg-yellow-400 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-gray-900">Premium</span><% } %>
+                                </div>
+                            </label>
+                            <% }) %>
+                        </div>
+                        <div class="mt-6 bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                            <h4 class="font-semibold text-lg mb-3">Industry Premium Theme</h4>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Choose a premium theme built for your profession or niche.</p>
+                            <select name="industry_theme" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                                <option value="">Select your professional theme</option>
+                                <% industryThemes.forEach(function(t) { %>
+                                <option value="<%= t.id %>" <%= user.profile && user.profile.theme === t.id ? 'selected' : '' %>><%= t.name %></option>
+                                <% }) %>
+                            </select>
+                            <p class="mt-3 text-xs text-amber-600 dark:text-amber-400"><%= user.isPremiumUser ? 'Pick a premium theme that matches your profession.' : 'Upgrade to premium to unlock tailored industry themes.' %></p>
+                        </div>
+                        <button type="submit" class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-save mr-2"></i>Save Theme</button>
+                    </form>
+                </div>
+
+                <!-- Spotlight -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-star mr-2"></i>Spotlight CTA Button</h3>
+                    <form method="POST" action="/dashboard/profile/spotlight" class="grid md:grid-cols-3 gap-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div><label class="block text-sm font-medium mb-1">Label</label><input type="text" name="spotlight_label" value="<%= user.profile && user.profile.spotlightLabel ? user.profile.spotlightLabel : '' %>" placeholder="Visit My Website" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        <div><label class="block text-sm font-medium mb-1">URL</label><input type="url" name="spotlight_url" value="<%= user.profile && user.profile.spotlightUrl ? user.profile.spotlightUrl : '' %>" placeholder="https://example.com" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        <div><label class="block text-sm font-medium mb-1">Icon</label>
+                            <select name="spotlight_icon" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                                <option value="">None</option><option value="globe" <%= user.profile && user.profile.spotlightIcon==='globe'?'selected':'' %>>Globe</option><option value="briefcase" <%= user.profile && user.profile.spotlightIcon==='briefcase'?'selected':'' %>>Briefcase</option><option value="envelope" <%= user.profile && user.profile.spotlightIcon==='envelope'?'selected':'' %>>Envelope</option><option value="rocket" <%= user.profile && user.profile.spotlightIcon==='rocket'?'selected':'' %>>Rocket</option>
+                            </select>
+                        </div>
+                        <div class="md:col-span-3"><button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-save mr-2"></i>Save Spotlight</button></div>
+                    </form>
+                </div>
+
+                <!-- Contact Form Toggle -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="font-semibold text-lg"><i class="fas fa-address-card mr-2"></i>Contact Form <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">Allow visitors to send you messages from your profile page.</p>
+                        </div>
+                        <form method="POST" action="/dashboard/profile/contact-form"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                            <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium <%= user.profile && user.profile.contactFormEnabled ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-400' : 'bg-gray-100 text-gray-600 dark:bg-gray-700 dark:text-gray-400' %>" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                                <% if (user.profile && user.profile.contactFormEnabled) { %><i class="fas fa-toggle-on mr-1"></i>Enabled<% } else { %><i class="fas fa-toggle-off mr-1"></i>Disabled<% } %>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Testimonials -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-quote-left mr-2"></i>Testimonials <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                    <% if (user.profile && user.profile.testimonials && user.profile.testimonials.length > 0) { %>
+                    <div class="space-y-3 mb-4">
+                        <% user.profile.testimonials.forEach(function(t, i) { %>
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg flex justify-between items-start">
+                            <div><p class="font-medium"><%= t.name %></p><p class="text-xs text-gray-500"><%= t.role || '' %></p><p class="text-sm mt-1">"<%= t.text %>"</p></div>
+                            <form method="POST" action="/dashboard/profile/testimonials/<%= i %>/delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></form>
+                        </div>
+                        <% }) %>
+                    </div>
+                    <% } %>
+                    <form method="POST" action="/dashboard/profile/testimonials" class="space-y-3"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <input type="text" name="testimonial_name" placeholder="Name" required class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                            <input type="text" name="testimonial_role" placeholder="Role (optional)" class="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        </div>
+                        <textarea name="testimonial_text" placeholder="Testimonial text..." required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>></textarea>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" <%= !user.isPremiumUser ? 'disabled' : '' %>><i class="fas fa-plus mr-1"></i>Add Testimonial</button>
+                    </form>
+                </div>
+
+                <!-- Resume -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-file-alt mr-2"></i>Resume / CV <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                    <% if (user.profile && user.profile.resume) { var resume = user.profile.resume; ['experience','education','skills'].forEach(function(key) { if (resume[key] && resume[key].length > 0) { %>
+                    <h4 class="font-medium capitalize mt-3 mb-2"><%= key %></h4>
+                    <div class="space-y-2 mb-3">
+                        <% resume[key].forEach(function(item, i) { %>
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg flex justify-between">
+                            <div><p class="font-medium"><%= item.title %></p><% if (item.subtitle) { %><p class="text-sm text-gray-500"><%= item.subtitle %></p><% } %><% if (item.period) { %><p class="text-xs text-gray-400"><%= item.period %></p><% } %></div>
+                            <form method="POST" action="/dashboard/profile/resume/<%= key === 'skills' ? 'skill' : key %>/<%= i %>/delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></form>
+                        </div>
+                        <% }) %>
+                    </div>
+                    <% } }) } %>
+                    <form method="POST" action="/dashboard/profile/resume" class="space-y-3 mt-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <select name="resume_type" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                            <option value="experience">Work Experience</option><option value="education">Education</option><option value="skill">Skill</option>
+                        </select>
+                        <input type="text" name="resume_title" placeholder="Title / Skill Name" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        <input type="text" name="resume_subtitle" placeholder="Subtitle (company/school)" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        <input type="text" name="resume_period" placeholder="Period (e.g., 2020-2023)" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        <textarea name="resume_description" placeholder="Description (optional)" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>></textarea>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" <%= !user.isPremiumUser ? 'disabled' : '' %>><i class="fas fa-plus mr-1"></i>Add Entry</button>
+                    </form>
+                </div>
+
+                <!-- Background Image -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-image mr-2"></i>Hero Background <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                    <% if (user.profile && user.profile.backgroundImage) { %>
+                    <div class="mb-4"><img src="/uploads/<%= user.profile.backgroundImage %>" class="w-full h-32 object-cover rounded-lg"><form method="POST" action="/dashboard/profile/background/delete" class="mt-2"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="text-sm text-red-500 hover:text-red-700"><i class="fas fa-trash mr-1"></i>Remove</button></form></div>
+                    <% } %>
+                    <form method="POST" action="/dashboard/profile/background" enctype="multipart/form-data" class="flex items-center space-x-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="file" name="background_image" accept="image/*" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" <%= !user.isPremiumUser ? 'disabled' : '' %>><i class="fas fa-upload mr-1"></i>Upload</button>
+                    </form>
+                </div>
+
+                <!-- Gallery -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-images mr-2"></i>Gallery <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                    <% if (user.profile && user.profile.gallery && user.profile.gallery.length > 0) { %>
+                    <div class="grid grid-cols-3 gap-3 mb-4">
+                        <% user.profile.gallery.forEach(function(img, i) { %>
+                        <div class="relative group"><img src="/uploads/<%= img %>" class="w-full h-24 object-cover rounded-lg"><form method="POST" action="/dashboard/profile/gallery/<%= i %>/delete" class="absolute top-1 right-1 opacity-0 group-hover:opacity-100"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="bg-red-500 text-white p-1 rounded text-xs"><i class="fas fa-trash"></i></button></form></div>
+                        <% }) %>
+                    </div>
+                    <% } %>
+                    <form method="POST" action="/dashboard/profile/gallery" enctype="multipart/form-data" class="flex items-center space-x-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="file" name="gallery_images" accept="image/*" multiple class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" <%= !user.isPremiumUser ? 'disabled' : '' %>><i class="fas fa-upload mr-1"></i>Upload</button>
+                    </form>
+                </div>
+
+                <!-- Videos -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-video mr-2"></i>Videos <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                    <% if (user.profile && user.profile.videos && user.profile.videos.length > 0) { %>
+                    <div class="space-y-2 mb-4">
+                        <% user.profile.videos.forEach(function(v, i) { %>
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg flex justify-between"><div><p class="font-medium"><%= v.title || 'Untitled' %></p><p class="text-sm text-gray-500 truncate"><%= v.url %></p></div><form method="POST" action="/dashboard/profile/videos/<%= i %>/delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></form></div>
+                        <% }) %>
+                    </div>
+                    <% } %>
+                    <form method="POST" action="/dashboard/profile/videos" class="grid md:grid-cols-3 gap-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="url" name="video_url" placeholder="Video URL" required class="md:col-span-2 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        <div class="flex space-x-2">
+                            <input type="text" name="video_title" placeholder="Title" class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                            <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" <%= !user.isPremiumUser ? 'disabled' : '' %>><i class="fas fa-plus"></i></button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Default Themes Menu -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-palette mr-2"></i>Default Themes Menu <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Set a default theme that will be applied to new visitors or when no theme is selected.</p>
+                    <form method="POST" action="/dashboard/profile/default-theme"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <select name="default_theme" class="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                            <option value="default" <%= user.profile && user.profile.defaultTheme === 'default' ? 'selected' : '' %>>Default</option>
+                            <option value="dark" <%= user.profile && user.profile.defaultTheme === 'dark' ? 'selected' : '' %>>Dark</option>
+                            <option value="minimal" <%= user.profile && user.profile.defaultTheme === 'minimal' ? 'selected' : '' %>>Minimal</option>
+                            <option value="gradient" <%= user.profile && user.profile.defaultTheme === 'gradient' ? 'selected' : '' %>>Gradient (Premium)</option>
+                            <option value="bold" <%= user.profile && user.profile.defaultTheme === 'bold' ? 'selected' : '' %>>Bold (Premium)</option>
+                            <option value="ocean" <%= user.profile && user.profile.defaultTheme === 'ocean' ? 'selected' : '' %>>Ocean (Premium)</option>
+                            <option value="sunset" <%= user.profile && user.profile.defaultTheme === 'sunset' ? 'selected' : '' %>>Sunset (Premium)</option>
+                            <option value="forest" <%= user.profile && user.profile.defaultTheme === 'forest' ? 'selected' : '' %>>Forest (Premium)</option>
+                        </select>
+                        <button type="submit" class="mt-4 px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" <%= !user.isPremiumUser ? 'disabled' : '' %>><i class="fas fa-save mr-2"></i>Save Default Theme</button>
+                    </form>
+                </div>
+
+                <!-- Pages Text & Notes -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-file-alt mr-2"></i>Pages Text & Notes <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Create custom pages with text content and notes for your profile.</p>
+                    <% if (user.profile && user.profile.pages && user.profile.pages.length > 0) { %>
+                    <div class="space-y-2 mb-4">
+                        <% user.profile.pages.forEach(function(page) { %>
+                        <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg flex justify-between">
+                            <div>
+                                <p class="font-medium"><%= page.title %></p>
+                                <p class="text-sm text-gray-500">/<%= user.profile.username %>/<%= page.slug %></p>
+                            </div>
+                            <form method="POST" action="/dashboard/profile/pages/<%= page.id %>/delete"><input type="hidden" name="_csrf" value="<%= csrfToken %>"><button type="submit" class="text-red-500 hover:text-red-700"><i class="fas fa-trash"></i></button></form>
+                        </div>
+                        <% }) %>
+                    </div>
+                    <% } %>
+                    <form method="POST" action="/dashboard/profile/pages" class="space-y-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <input type="text" name="page_title" placeholder="Page Title" required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        <input type="text" name="page_slug" placeholder="Page Slug (optional, auto-generated from title)" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        <textarea name="page_content" rows="6" placeholder="Page content..." required class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>></textarea>
+                        <button type="submit" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" <%= !user.isPremiumUser ? 'disabled' : '' %>><i class="fas fa-plus mr-1"></i>Add Page</button>
+                    </form>
+                </div>
+
+                <!-- Integrations -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-plug mr-2"></i>Integrations <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Connect external services and add custom code to your profile.</p>
+                    <form method="POST" action="/dashboard/profile/integrations" class="space-y-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Google Analytics ID</label>
+                            <input type="text" name="integration_google_analytics" value="<%= user.profile && user.profile.integrations && user.profile.integrations.google_analytics ? user.profile.integrations.google_analytics : '' %>" placeholder="GA4-MEASUREMENT-ID" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Facebook Pixel ID</label>
+                            <input type="text" name="integration_facebook_pixel" value="<%= user.profile && user.profile.integrations && user.profile.integrations.facebook_pixel ? user.profile.integrations.facebook_pixel : '' %>" placeholder="123456789012345" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Twitter Pixel ID</label>
+                            <input type="text" name="integration_twitter_pixel" value="<%= user.profile && user.profile.integrations && user.profile.integrations.twitter_pixel ? user.profile.integrations.twitter_pixel : '' %>" placeholder="abcd1234" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Custom CSS</label>
+                            <textarea name="integration_custom_css" rows="4" placeholder="Add custom CSS code..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>><%= user.profile && user.profile.integrations && user.profile.integrations.custom_css ? user.profile.integrations.custom_css : '' %></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Custom JavaScript</label>
+                            <textarea name="integration_custom_js" rows="4" placeholder="Add custom JavaScript code..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>><%= user.profile && user.profile.integrations && user.profile.integrations.custom_js ? user.profile.integrations.custom_js : '' %></textarea>
+                        </div>
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" <%= !user.isPremiumUser ? 'disabled' : '' %>><i class="fas fa-save mr-2"></i>Save Integrations</button>
+                    </form>
+                </div>
+
+                <!-- Footer -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-shoe-prints mr-2"></i>Footer <% if (!user.isPremiumUser) { %><span class="text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full ml-2"><i class="fas fa-crown mr-1"></i>Premium</span><% } %></h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400 mb-4">Customize the footer content and links on your profile page.</p>
+                    <form method="POST" action="/dashboard/profile/footer" class="space-y-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Footer Text</label>
+                            <textarea name="footer_text" rows="3" placeholder="Add footer text..." class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>><%= user.profile && user.profile.footer && user.profile.footer.text ? user.profile.footer.text : '' %></textarea>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium mb-1">Footer Links (JSON format)</label>
+                            <textarea name="footer_links" rows="4" placeholder='[{"text": "Privacy Policy", "url": "/privacy"}, {"text": "Terms", "url": "/terms"}]' class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" <%= !user.isPremiumUser ? 'disabled' : '' %>><%= user.profile && user.profile.footer && user.profile.footer.links ? JSON.stringify(user.profile.footer.links, null, 2) : '' %></textarea>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" name="footer_show_branding" id="footer_show_branding" <%= user.profile && user.profile.footer && user.profile.footer.showBranding ? 'checked' : '' %> class="mr-2" <%= !user.isPremiumUser ? 'disabled' : '' %>>
+                            <label for="footer_show_branding" class="text-sm">Show DropLaunch branding</label>
+                        </div>
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition" <%= !user.isPremiumUser ? 'disabled' : '' %>><i class="fas fa-save mr-2"></i>Save Footer</button>
+                    </form>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

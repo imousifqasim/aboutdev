@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false, currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
+<head><%- include('../../layouts/partials/head') %><title>Settings - <%= appName %></title></head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+<div class="flex min-h-screen">
+    <%- include('../../layouts/partials/admin-sidebar') %>
+    <div class="flex-1 flex overflow-hidden">
+        <%- include('../partials/submenu') %>
+        <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+            <%- include('../../layouts/partials/dashboard-header', { title: 'Settings' }) %>
+            <main class="flex-1 overflow-y-auto p-5">
+            <%- include('../../layouts/partials/flash') %>
+            <div class="max-w-4xl">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-gray-200 dark:border-gray-700">
+                    <h3 class="font-semibold text-lg mb-4"><i class="fas fa-cog mr-2"></i>Site Settings</h3>
+                    <form method="POST" action="/admin/settings" class="space-y-4"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Site Name</label><input type="text" name="site_name" value="<%= settings.site_name || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                            <div><label class="block text-sm font-medium mb-1">Contact Email</label><input type="email" name="contact_email" value="<%= settings.contact_email || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Site Description</label><textarea name="site_description" rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"><%= settings.site_description || '' %></textarea></div>
+                        <div><label class="block text-sm font-medium mb-1">Keywords</label><input type="text" name="site_keywords" value="<%= settings.site_keywords || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        <div class="rounded-lg border border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900 p-4 text-sm text-gray-600 dark:text-gray-300">
+                            <p class="font-medium mb-2">DNS and custom domain guidance</p>
+                            <ul class="list-disc pl-5 space-y-1">
+                                <li>Use a root domain like <span class="font-mono">example.com</span> or a subdomain like <span class="font-mono">www.example.com</span>.</li>
+                                <li>For a subdomain, create a <strong>CNAME</strong> record pointing to <span class="font-mono"><%= settings.custom_domain_target || 'your-app-host.example.com' %></span>.</li>
+                                <li>For a root domain, create an <strong>A</strong> record pointing to your app server IP address.</li>
+                                <li>Allow up to 24 hours for DNS changes to propagate before testing.</li>
+                            </ul>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Open Graph Title</label><input type="text" name="site_og_title" value="<%= settings.site_og_title || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                            <div><label class="block text-sm font-medium mb-1">Open Graph Description</label><input type="text" name="site_og_description" value="<%= settings.site_og_description || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Open Graph Image URL</label><input type="text" name="site_og_image" value="<%= settings.site_og_image || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" placeholder="https://example.com/og-image.jpg"></div>
+                            <div><label class="block text-sm font-medium mb-1">Twitter Handle</label><input type="text" name="site_twitter_handle" value="<%= settings.site_twitter_handle || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" placeholder="@yourhandle"></div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Custom Domain Host</label><input type="text" name="custom_domain_target" value="<%= settings.custom_domain_target || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" placeholder="your-app-host.example.com or IP"></div>
+                            <div><label class="block text-sm font-medium mb-1">Canonical URL</label><input type="text" name="site_canonical_url" value="<%= settings.site_canonical_url || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700" placeholder="https://example.com"></div>
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div><label class="block text-sm font-medium mb-1">Premium Price (USD)</label><input type="text" name="premium_price_usd" value="<%= settings.premium_price_usd || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                            <div><label class="block text-sm font-medium mb-1">Premium Price (PKR)</label><input type="text" name="premium_price_pkr" value="<%= settings.premium_price_pkr || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        </div>
+                        <div><label class="block text-sm font-medium mb-1">Footer Text</label><input type="text" name="footer_text" value="<%= settings.footer_text || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-save mr-2"></i>Save Settings</button>
+                    </form>
+                </div>
+            </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

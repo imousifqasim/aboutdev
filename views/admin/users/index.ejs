@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= appName %></title>
+    <%- include('../../layouts/partials/head') %>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <%- include('../../layouts/partials/admin-sidebar') %>
+
+    <div class="ml-64 flex">
+        <%- include('../partials/submenu') %>
+        <div class="flex-1 p-8">
+            <div class="max-w-7xl mx-auto">
+            <!-- Header -->
+            <div class="flex justify-between items-center mb-8">
+                <div>
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Users Management</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">Manage user accounts and permissions</p>
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                    Total: <%= totalUsers %> users
+                </div>
+            </div>
+
+            <!-- Users Table -->
+            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">User</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Provider</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Role</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Status</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Plan</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">2FA</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Joined</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <% users.forEach(user => { %>
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="flex items-center">
+                                        <div class="flex-shrink-0 h-10 w-10">
+                                            <% if (user.profile && user.profile.image) { %>
+                                            <img class="h-10 w-10 rounded-full object-cover" src="/uploads/profiles/<%= user.profile.image %>" alt="<%= user.name %>">
+                                            <% } else { %>
+                                            <div class="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                                                <i class="fas fa-user text-gray-600 dark:text-gray-400"></i>
+                                            </div>
+                                            <% } %>
+                                        </div>
+                                        <div class="ml-4">
+                                            <div class="text-sm font-medium text-gray-900 dark:text-white"><%= user.name %></div>
+                                            <div class="text-sm text-gray-500 dark:text-gray-400"><%= user.email %></div>
+                                            <% if (user.profile && user.profile.username) { %>
+                                            <div class="text-xs text-gray-400 dark:text-gray-500">@<%= user.profile.username %></div>
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium capitalize <%= user.provider === 'google' ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' : user.provider === 'github' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' %>">
+                                        <%= user.provider %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= user.role === 'admin' ? 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' %>">
+                                        <%= user.role %>
+                                    </span>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <% if (user.isBanned) { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
+                                        <i class="fas fa-ban mr-1"></i>Banned
+                                    </span>
+                                    <% } else { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        <i class="fas fa-check-circle mr-1"></i>Active
+                                    </span>
+                                    <% } %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                                    <% if (user.subscriptions && user.subscriptions.length > 0) { %>
+                                    <span class="capitalize"><%= user.subscriptions[0].plan %></span>
+                                    <% } else { %>
+                                    <span class="text-gray-500 dark:text-gray-400">Free</span>
+                                    <% } %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <% if (user.twoFactorEnabled) { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                                        <i class="fas fa-shield-alt mr-1"></i>Enabled
+                                    </span>
+                                    <% } else { %>
+                                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                                        <i class="fas fa-shield-alt mr-1"></i>Disabled
+                                    </span>
+                                    <% } %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    <%= formatDate(user.createdAt) %>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                                    <div class="flex items-center space-x-2">
+                                        <a href="/admin/users/<%= user.id %>" class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <form method="POST" action="/admin/users/<%= user.id %>/ban" class="inline" onsubmit="return confirm('Are you sure you want to <%= user.isBanned ? 'unban' : 'ban' %> this user?')">
+                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                            <button type="submit" class="<%= user.isBanned ? 'text-green-600 hover:text-green-900' : 'text-red-600 hover:text-red-900' %>">
+                                                <i class="fas fa-<%= user.isBanned ? 'check' : 'ban' %>"></i>
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="/admin/users/<%= user.id %>/delete" class="inline" onsubmit="return confirm('Are you sure you want to delete this user? This action cannot be undone.')">
+                                            <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                            <button type="submit" class="text-red-600 hover:text-red-900">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                            <% }) %>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <% if (totalPages > 1) { %>
+                <div class="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6">
+                    <div class="flex-1 flex justify-between sm:hidden">
+                        <% if (currentPage > 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">Previous</a>
+                        <% } %>
+                        <% if (currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>" class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 text-sm font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">Next</a>
+                        <% } %>
+                    </div>
+                    <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                        <div>
+                            <p class="text-sm text-gray-700 dark:text-gray-300">
+                                Showing <span class="font-medium"><%= ((currentPage - 1) * 20) + 1 %></span> to <span class="font-medium"><%= Math.min(currentPage * 20, totalUsers) %></span> of <span class="font-medium"><%= totalUsers %></span> results
+                            </p>
+                        </div>
+                        <div>
+                            <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                                <% if (currentPage > 1) { %>
+                                <a href="?page=<%= currentPage - 1 %>" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                                <% } %>
+
+                                <% for (let i = Math.max(1, currentPage - 2); i <= Math.min(totalPages, currentPage + 2); i++) { %>
+                                <a href="?page=<%= i %>" class="relative inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium <%= i === currentPage ? 'text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900 border-indigo-500' : 'text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700' %>">
+                                    <%= i %>
+                                </a>
+                                <% } %>
+
+                                <% if (currentPage < totalPages) { %>
+                                <a href="?page=<%= currentPage + 1 %>" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-sm font-medium text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                                <% } %>
+                            </nav>
+                        </div>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

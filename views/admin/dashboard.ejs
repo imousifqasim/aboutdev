@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false, currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
+<head><%- include('../layouts/partials/head') %><title>Admin Dashboard - <%= appName %></title></head>
+<body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
+<div class="flex min-h-screen overflow-hidden">
+    <%- include('../layouts/partials/admin-sidebar') %>
+    <div class="flex flex-1 overflow-hidden">
+        <%- include('./partials/submenu') %>
+        <div class="flex-1 flex flex-col overflow-hidden">
+        <header class="flex items-center justify-between gap-4 px-6 py-5 bg-white/80 dark:bg-slate-950/90 border-b border-slate-200 dark:border-slate-800 backdrop-blur">
+            <div>
+                <p class="text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Admin Panel</p>
+                <h1 class="mt-2 text-2xl font-semibold text-slate-900 dark:text-slate-100">Admin Dashboard</h1>
+                <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Monitor users, payments, and system metrics.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <div class="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 px-3.5 py-2.5 text-slate-700 dark:text-slate-100 shadow-sm">
+                    <p class="text-xs uppercase tracking-[0.24em] text-slate-400">Status</p>
+                    <p class="mt-1 font-semibold">Active</p>
+                </div>
+            </div>
+        </header>
+        <main class="flex-1 overflow-y-auto p-6 lg:p-8">
+            <div class="grid gap-6 xl:grid-cols-[1.8fr_1fr] mb-6">
+                <section class="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-700 text-white p-6 shadow-xl shadow-indigo-500/10 overflow-hidden relative">
+                    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.15),_transparent_40%)]"></div>
+                    <div class="relative z-10 grid gap-6 lg:grid-cols-[1.5fr_1fr] items-center">
+                        <div>
+                            <p class="text-sm uppercase tracking-[0.3em] text-slate-300">System Overview</p>
+                            <h2 class="mt-4 text-3xl font-semibold">Manage your platform</h2>
+                            <p class="mt-4 max-w-xl text-slate-200/90">Track user growth, monitor payments, and oversee platform operations from this central dashboard.</p>
+                            <div class="mt-6 flex flex-wrap gap-3">
+                                <a href="/admin/users" class="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-sm font-semibold text-white border border-white/10 hover:bg-white/15 transition"><i class="fas fa-users"></i> Manage Users</a>
+                                <a href="/admin/payments" class="inline-flex items-center gap-2 rounded-full bg-white/10 px-5 py-3 text-sm font-semibold text-white border border-white/10 hover:bg-white/15 transition"><i class="fas fa-credit-card"></i> View Payments</a>
+                            </div>
+                        </div>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="rounded-2xl border border-white/10 bg-white/10 p-4 shadow-md shadow-black/10 backdrop-blur">
+                                <p class="text-xs uppercase tracking-[0.28em] text-slate-200">Total Users</p>
+                                <p class="mt-3 text-xl font-semibold"><%= totalUsers %></p>
+                            </div>
+                            <div class="rounded-2xl border border-white/10 bg-white/10 p-4 shadow-md shadow-black/10 backdrop-blur">
+                                <p class="text-xs uppercase tracking-[0.28em] text-slate-200">Premium Users</p>
+                                <p class="mt-3 text-xl font-semibold"><%= premiumUsers %></p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <section class="grid gap-6">
+                    <div class="rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-xl shadow-slate-900/5 border border-slate-200 dark:border-slate-800">
+                        <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Key Metrics</p>
+                        <div class="mt-6 grid gap-4 sm:grid-cols-2">
+                            <div class="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 border border-slate-200 dark:border-slate-800">
+                                <p class="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Pending Payments</p>
+                                <p class="mt-3 text-3xl font-semibold text-slate-900 dark:text-white"><%= pendingPayments %></p>
+                            </div>
+                            <div class="rounded-2xl bg-slate-50 dark:bg-slate-950 p-4 border border-slate-200 dark:border-slate-800">
+                                <p class="text-xs uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">Total Revenue</p>
+                                <p class="mt-3 text-3xl font-semibold text-slate-900 dark:text-white">$<%= totalRevenue.toFixed(2) %></p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-xl shadow-slate-900/5 border border-slate-200 dark:border-slate-800">
+                        <p class="text-sm uppercase tracking-[0.3em] text-slate-400">Actions</p>
+                        <div class="mt-6 space-y-3">
+                            <a href="/admin/users" class="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                <span>Manage users</span><i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="/admin/payments" class="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                <span>Review payments</span><i class="fas fa-chevron-right"></i>
+                            </a>
+                            <a href="/admin/settings" class="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3 text-slate-700 dark:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 transition">
+                                <span>System settings</span><i class="fas fa-chevron-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </section>
+            </div>
+            <div class="grid gap-6 lg:grid-cols-[1.4fr_0.8fr]">
+                <div class="rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-xl shadow-slate-900/5 border border-slate-200 dark:border-slate-800">
+                    <div class="flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-xl font-semibold text-slate-900 dark:text-white">User Growth</h2>
+                            <p class="mt-2 text-sm text-slate-500 dark:text-slate-400">Last 6 months of user registrations.</p>
+                        </div>
+                        <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700 dark:bg-slate-800 dark:text-slate-300">Monthly</span>
+                    </div>
+                    <div class="mt-6">
+                        <canvas id="userGrowthChart" height="220"></canvas>
+                    </div>
+                </div>
+                <div class="space-y-6">
+                    <div class="rounded-2xl bg-white dark:bg-slate-900 p-5 shadow-xl shadow-slate-900/5 border border-slate-200 dark:border-slate-800">
+                        <h2 class="text-xl font-semibold text-slate-900 dark:text-white">Recent Payments</h2>
+                        <% if (recentPayments.length === 0) { %>
+                        <p class="mt-4 text-sm text-slate-500 dark:text-slate-400">No payments yet.</p>
+                        <% } else { %>
+                        <div class="mt-4 space-y-3">
+                            <% recentPayments.forEach(function(p) { %>
+                            <div class="flex items-center justify-between rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950 px-4 py-3">
+                                <div>
+                                    <p class="font-semibold text-slate-900 dark:text-white"><%= p.user.name %></p>
+                                    <p class="text-sm text-slate-500 dark:text-slate-400"><%= p.method %> - $<%= parseFloat(p.amount).toFixed(2) %></p>
+                                </div>
+                                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold <%= p.status === 'approved' ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' : p.status === 'rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300' : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' %>"><%= p.status %></span>
+                            </div>
+                            <% }) %>
+                        </div>
+                        <% } %>
+                    </div>
+                    <div class="rounded-2xl bg-indigo-600 p-5 text-white shadow-xl shadow-indigo-500/20">
+                        <h2 class="text-xl font-semibold">Admin Tools</h2>
+                        <p class="mt-3 text-sm text-indigo-100/90">Access advanced admin features, manage subscriptions, and monitor system health.</p>
+                        <a href="/admin/settings" class="mt-6 inline-flex items-center gap-2 rounded-full bg-white/10 px-4 py-2.5 text-sm font-semibold text-white hover:bg-white/20 transition"><i class="fas fa-cog"></i>System Settings</a>
+                    </div>
+                </div>
+            </div>
+        </main>
+        </div>
+    </div>
+</div>
+<script>
+const chartData = <%- JSON.stringify(monthlyUsers) %>;
+const ctx = document.getElementById('userGrowthChart');
+if (ctx) {
+    new Chart(ctx.getContext('2d'), {
+        type: 'bar',
+        data: { labels: chartData.map(d => d.month), datasets: [{ label: 'New Users', data: chartData.map(d => d.count), backgroundColor: 'rgba(99,102,241,0.5)', borderColor: '#6366f1', borderWidth: 1 }] },
+        options: { responsive: true, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
+    });
+}
+</script>
+</body>
+</html>

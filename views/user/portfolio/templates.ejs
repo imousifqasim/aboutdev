@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<head><%- include('../../../layouts/partials/head') %><title>Portfolio Templates - <%= appName %></title></head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+<div class="flex min-h-screen">
+    <%- include('../../../layouts/partials/user-sidebar') %>
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <%- include('../../../layouts/partials/dashboard-header', { title: 'Portfolio Templates' }) %>
+        <main class="flex-1 overflow-y-auto p-6">
+            <%- include('../../../layouts/partials/flash') %>
+
+            <div class="max-w-6xl mx-auto">
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold mb-2">Choose a Portfolio Template</h1>
+                    <p class="text-gray-600 dark:text-gray-300">Start with a professionally designed template and customize it to match your style.</p>
+                </div>
+
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <% 
+                    const categories = {};
+                    templates.forEach(template => {
+                        if (!categories[template.category]) {
+                            categories[template.category] = [];
+                        }
+                        categories[template.category].push(template);
+                    });
+                    
+                    Object.keys(categories).forEach(category => {
+                    %>
+                    <div class="col-span-full">
+                        <h2 class="text-2xl font-bold mb-4 text-indigo-600 dark:text-indigo-400"><%= category %></h2>
+                        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                            <% categories[category].forEach(template => { %>
+                            <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition">
+                                <!-- Template Preview -->
+                                <div class="aspect-video bg-gradient-to-br <%= template.id === 'developer' ? 'from-blue-500 to-indigo-600' : template.id === 'designer' ? 'from-pink-500 to-purple-600' : template.id === 'freelancer' ? 'from-green-500 to-teal-600' : template.id === 'photographer' ? 'from-purple-500 to-indigo-600' : template.id === 'student' ? 'from-blue-500 to-cyan-600' : 'from-gray-500 to-gray-600' %> flex items-center justify-center">
+                                    <i class="fas fa-<%= template.id === 'developer' ? 'code' : template.id === 'designer' ? 'palette' : template.id === 'freelancer' ? 'briefcase' : template.id === 'photographer' ? 'camera' : template.id === 'student' ? 'graduation-cap' : 'building' %> text-white text-6xl"></i>
+                                </div>
+
+                                <!-- Template Info -->
+                                <div class="p-6">
+                                    <h3 class="text-xl font-semibold mb-2"><%= template.name %></h3>
+                                    <p class="text-gray-600 dark:text-gray-300 mb-4"><%= template.description %></p>
+
+                                    <!-- Template Features -->
+                                    <div class="mb-4">
+                                        <h4 class="font-medium mb-2 text-sm">Includes:</h4>
+                                        <div class="flex flex-wrap gap-1">
+                                            <% template.sections.forEach(section => { %>
+                                            <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-1 rounded-full capitalize"><%= section.type %></span>
+                                            <% }) %>
+                                        </div>
+                                    </div>
+
+                                    <!-- Apply Template Button -->
+                                    <form method="POST" action="/dashboard/portfolio/templates/apply">
+                                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                                        <input type="hidden" name="template_id" value="<%= template.id %>">
+                                        <button type="submit" class="w-full bg-indigo-600 text-white py-2 px-4 rounded-lg hover:bg-indigo-700 transition">
+                                            Use This Template
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                            <% }) %>
+                        </div>
+                    </div>
+                    <% }) %>
+
+                    <!-- Custom Template -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition border-2 border-dashed border-gray-300 dark:border-gray-600">
+                        <div class="aspect-video bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+                            <i class="fas fa-plus text-6xl text-gray-400"></i>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-semibold mb-2">Start from Scratch</h3>
+                            <p class="text-gray-600 dark:text-gray-300 mb-4">Create your portfolio from the ground up with our drag-and-drop builder.</p>
+                            <a href="/dashboard/portfolio" class="w-full bg-gray-600 text-white py-2 px-4 rounded-lg hover:bg-gray-700 transition inline-block text-center">
+                                Build Custom Portfolio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Template Features -->
+                <div class="mt-12 bg-white dark:bg-gray-800 rounded-xl p-8">
+                    <h2 class="text-2xl font-bold mb-6 text-center">All Templates Include</h2>
+                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="text-center">
+                            <i class="fas fa-mobile-alt text-4xl text-indigo-600 mb-4"></i>
+                            <h3 class="font-semibold mb-2">Mobile Responsive</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm">Looks great on all devices</p>
+                        </div>
+                        <div class="text-center">
+                            <i class="fas fa-search text-4xl text-green-600 mb-4"></i>
+                            <h3 class="font-semibold mb-2">SEO Optimized</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm">Built-in SEO features</p>
+                        </div>
+                        <div class="text-center">
+                            <i class="fas fa-paint-brush text-4xl text-purple-600 mb-4"></i>
+                            <h3 class="font-semibold mb-2">Customizable</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm">Easy to customize and modify</p>
+                        </div>
+                        <div class="text-center">
+                            <i class="fas fa-rocket text-4xl text-orange-600 mb-4"></i>
+                            <h3 class="font-semibold mb-2">Fast Loading</h3>
+                            <p class="text-gray-600 dark:text-gray-300 text-sm">Optimized for speed</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AI Template Suggestion -->
+                <% if (user.isPremiumUser) { %>
+                <div class="mt-8 bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-8 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h2 class="text-2xl font-bold mb-2">AI-Powered Templates</h2>
+                            <p class="mb-4">Get personalized template recommendations based on your profile and industry.</p>
+                            <button class="bg-white text-indigo-600 px-6 py-2 rounded-lg hover:bg-gray-100 transition font-semibold">
+                                <i class="fas fa-magic mr-2"></i>Get AI Suggestions
+                            </button>
+                        </div>
+                        <i class="fas fa-robot text-6xl opacity-50"></i>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false, currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
+<head><%- include('../../layouts/partials/head') %><title>Payment #<%= payment.id %> - <%= appName %></title></head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+<div class="flex h-screen overflow-hidden">
+    <%- include('../../layouts/partials/admin-sidebar') %>
+    <div class="flex-1 flex overflow-hidden">
+        <%- include('../partials/submenu') %>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <%- include('../../layouts/partials/dashboard-header', { title: 'Payment Details' }) %>
+            <main class="flex-1 overflow-y-auto p-5">
+            <%- include('../../layouts/partials/flash') %>
+            <div class="max-w-4xl space-y-5">
+                <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-gray-200 dark:border-gray-700">
+                    <div class="grid md:grid-cols-2 gap-5">
+                        <div>
+                            <h3 class="font-semibold text-lg mb-4">Payment Information</h3>
+                            <dl class="space-y-3">
+                                <div><dt class="text-sm text-gray-500">User</dt><dd class="font-medium"><%= payment.user.name %> (<%= payment.user.email %>)</dd></div>
+                                <div><dt class="text-sm text-gray-500">Method</dt><dd class="font-medium"><%= payment.method %></dd></div>
+                                <div><dt class="text-sm text-gray-500">Amount</dt><dd class="font-medium text-lg">$<%= parseFloat(payment.amount).toFixed(2) %></dd></div>
+                                <div><dt class="text-sm text-gray-500">Transaction ID</dt><dd class="font-mono"><%= payment.transactionId %></dd></div>
+                                <div><dt class="text-sm text-gray-500">Status</dt><dd><span class="px-2 py-1 text-xs rounded-full font-medium <%= payment.status === 'approved' ? 'bg-green-100 text-green-800' : payment.status === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800' %>"><%= payment.status %></span></dd></div>
+                                <div><dt class="text-sm text-gray-500">Date</dt><dd><%= new Date(payment.createdAt).toLocaleString() %></dd></div>
+                                <% if (payment.adminNote) { %><div><dt class="text-sm text-gray-500">Admin Note</dt><dd><%= payment.adminNote %></dd></div><% } %>
+                            </dl>
+                        </div>
+                        <div>
+                            <h3 class="font-semibold text-lg mb-4">Screenshot</h3>
+                            <% if (payment.screenshotPath) { %><img src="/uploads/<%= payment.screenshotPath %>" class="w-full rounded-lg border border-gray-200 dark:border-gray-600"><% } else { %><p class="text-gray-500">No screenshot uploaded.</p><% } %>
+                        </div>
+                    </div>
+                </div>
+                <% if (payment.status === 'pending') { %>
+                <div class="grid md:grid-cols-2 gap-5">
+                    <form method="POST" action="/admin/payments/<%= payment.id %>/approve" class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-green-200 dark:border-green-700"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <h3 class="font-semibold text-lg mb-4 text-green-700 dark:text-green-400"><i class="fas fa-check-circle mr-2"></i>Approve Payment</h3>
+                        <p class="text-sm text-gray-500 mb-4">This will activate the user's premium subscription for 1 year.</p>
+                        <button type="submit" class="px-5 py-2 bg-green-600 text-white rounded-xl hover:bg-green-700 transition"><i class="fas fa-check mr-2"></i>Approve & Activate Premium</button>
+                    </form>
+                    <form method="POST" action="/admin/payments/<%= payment.id %>/reject" class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-red-200 dark:border-red-700"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        <h3 class="font-semibold text-lg mb-4 text-red-700 dark:text-red-400"><i class="fas fa-times-circle mr-2"></i>Reject Payment</h3>
+                        <textarea name="admin_note" placeholder="Reason for rejection..." rows="3" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 mb-4"></textarea>
+                        <button type="submit" class="px-5 py-2 bg-red-600 text-white rounded-xl hover:bg-red-700 transition"><i class="fas fa-times mr-2"></i>Reject</button>
+                    </form>
+                </div>
+                <% } %>
+                <a href="/admin/payments" class="inline-flex items-center text-indigo-600 hover:text-indigo-800"><i class="fas fa-arrow-left mr-2"></i>Back to Payments</a>
+            </div>
+        </main>
+    </div>
+</div>
+</body>
+</html>

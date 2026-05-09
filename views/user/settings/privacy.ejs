@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= appName %></title>
+    <%- include('../../layouts/partials/head') %>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900">
+    <%- include('../../layouts/partials/dashboard-header') %>
+
+    <div class="flex">
+        <%- include('../../layouts/partials/user-sidebar') %>
+
+        <main class="flex-1 flex">
+            <!-- Settings Submenu -->
+            <%- include('./partials/submenu') %>
+
+            <!-- Settings Content -->
+            <div class="flex-1 p-8">
+                <!-- Header -->
+                <div class="mb-8">
+                    <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Privacy Settings</h1>
+                    <p class="text-gray-600 dark:text-gray-400 mt-2">Control profile visibility and privacy preferences</p>
+                </div>
+
+                <%- include('../../layouts/partials/flash') %>
+
+                <!-- Profile Visibility -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Profile Visibility</h3>
+                    
+                    <form method="POST" action="/dashboard/settings/privacy" class="space-y-6">
+                        <input type="hidden" name="_csrf" value="<%= csrfToken %>">
+                        
+                        <div class="space-y-4">
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Make profile public</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Your portfolio can be discovered by search engines and the discover page</p>
+                                </div>
+                                <input type="checkbox" name="isPublic" <%= (user.profile && user.profile.isPublic) ? 'checked' : '' %> class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Show in discover</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Allow your portfolio to appear in the discover section</p>
+                                </div>
+                                <input type="checkbox" name="showInDiscover" <%= (user.profile && user.profile.showInDiscover) ? 'checked' : '' %> class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Allow comments</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Allow others to comment on your portfolio posts</p>
+                                </div>
+                                <input type="checkbox" name="allowComments" <%= (user.profile && user.profile.allowComments) ? 'checked' : '' %> class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                            </div>
+
+                            <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                                <div>
+                                    <p class="font-medium text-gray-900 dark:text-white">Allow messaging</p>
+                                    <p class="text-sm text-gray-600 dark:text-gray-400">Allow others to send you direct messages</p>
+                                </div>
+                                <input type="checkbox" name="allowMessaging" <%= (user.profile && user.profile.allowMessaging) ? 'checked' : '' %> class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="px-6 py-2 bg-indigo-600 text-white font-medium rounded-lg hover:bg-indigo-700 transition">
+                            Save Privacy Settings
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Search Engine Indexing -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Search Engine Optimization</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="p-4 bg-blue-50 dark:bg-blue-900 border border-blue-200 dark:border-blue-700 rounded-lg">
+                            <p class="text-sm text-blue-900 dark:text-blue-100">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Your profile follows your public/private settings. When your profile is public, search engines can index your portfolio.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Contact Information Visibility -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">Contact Information Visibility</h3>
+                    
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Show email address</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Display your email on your public profile</p>
+                            </div>
+                            <input type="checkbox" name="showEmail" class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Show phone number</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Display your phone number on your public profile</p>
+                            </div>
+                            <input type="checkbox" name="showPhone" class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
+                        <div class="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+                            <div>
+                                <p class="font-medium text-gray-900 dark:text-white">Show social links</p>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Display your social media links publicly</p>
+                            </div>
+                            <input type="checkbox" name="showSocial" class="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>
