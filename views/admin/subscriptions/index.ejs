@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false, currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
 <head><%- include('../../layouts/partials/head') %><title>Subscriptions - <%= appName %></title></head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
 <div class="flex h-screen overflow-hidden">
     <%- include('../../layouts/partials/admin-sidebar') %>
-    <div class="flex-1 flex flex-col overflow-hidden">
-        <%- include('../../layouts/partials/dashboard-header', { title: 'Subscriptions' }) %>
-        <main class="flex-1 overflow-y-auto p-6">
+    <div class="flex-1 flex overflow-hidden">
+        <%- include('../partials/submenu') %>
+        <div class="flex-1 flex flex-col overflow-hidden">
+            <%- include('../../layouts/partials/dashboard-header', { title: 'Subscriptions' }) %>
+            <main class="flex-1 overflow-y-auto p-6">
             <%- include('../../layouts/partials/flash') %>
             <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700">
                 <div class="overflow-x-auto"><table class="w-full text-sm"><thead><tr class="border-b dark:border-gray-700 bg-gray-50 dark:bg-gray-700"><th class="text-left py-3 px-4">User</th><th class="text-left py-3 px-4">Plan</th><th class="text-left py-3 px-4">Status</th><th class="text-left py-3 px-4">Started</th><th class="text-left py-3 px-4">Ends</th><th class="text-left py-3 px-4">Actions</th></tr></thead><tbody>
@@ -21,6 +23,7 @@
                 </tr>
                 <% }) %>
                 </tbody></table></div>
+            </div>
             </div>
         </main>
     </div>

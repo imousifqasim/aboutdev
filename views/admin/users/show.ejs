@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,8 +9,10 @@
 <body class="bg-gray-50 dark:bg-gray-900">
     <%- include('../../layouts/partials/admin-sidebar') %>
 
-    <div class="ml-64 p-8">
-        <div class="max-w-6xl mx-auto">
+    <div class="ml-64 flex">
+        <%- include('../partials/submenu') %>
+        <div class="flex-1 p-8">
+            <div class="max-w-6xl mx-auto">
             <!-- Flash Messages -->
             <%- include('../../layouts/partials/flash') %>
 
@@ -274,11 +276,5 @@
             </div>
         </div>
     </div>
-</body>
-</html>
-            </div>
-        </main>
-    </div>
-</div>
 </body>
 </html>

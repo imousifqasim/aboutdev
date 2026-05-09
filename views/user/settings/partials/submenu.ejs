@@ -1,0 +1,65 @@
+<!-- Settings Navigation Submenu -->
+<div class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-6 space-y-2">
+    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-4">Settings</h3>
+    
+    <a href="/dashboard/settings/account" 
+       :class="currentPath === '/dashboard/settings/account' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-user w-4"></i>Account Settings
+    </a>
+
+    <a href="/dashboard/settings/security" 
+       :class="currentPath === '/dashboard/settings/security' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-shield-alt w-4"></i>Security
+    </a>
+
+    <a href="/dashboard/settings/privacy" 
+       :class="currentPath === '/dashboard/settings/privacy' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-lock w-4"></i>Privacy
+    </a>
+
+    <a href="/dashboard/settings/notifications" 
+       :class="currentPath === '/dashboard/settings/notifications' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-bell w-4"></i>Notifications
+    </a>
+
+    <a href="/dashboard/settings/billing" 
+       :class="currentPath === '/dashboard/settings/billing' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-credit-card w-4"></i>Billing & Subscription
+    </a>
+
+    <a href="/dashboard/settings/domain" 
+       :class="currentPath === '/dashboard/settings/domain' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-globe w-4"></i>Custom Domain
+    </a>
+
+    <a href="/dashboard/settings/media" 
+       :class="currentPath === '/dashboard/settings/media' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-images w-4"></i>Media Library
+    </a>
+
+    <a href="/dashboard/settings/social" 
+       :class="currentPath === '/dashboard/settings/social' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-share-alt w-4"></i>Social Links
+    </a>
+
+    <a href="/dashboard/settings/api" 
+       :class="currentPath === '/dashboard/settings/api' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-code w-4"></i>API & Integrations
+    </a>
+
+    <hr class="my-4 border-gray-200 dark:border-gray-700">
+
+    <a href="/dashboard" 
+       class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-arrow-left w-4"></i>Back to Dashboard
+    </a>
+</div>

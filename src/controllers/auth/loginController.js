@@ -2,15 +2,6 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 const prisma = require('../../prisma');
 const { sendPasswordResetEmail } = require('../../mail');
-
-exports.showLoginForm = (req, res) => {
-  res.render('auth/login', { title: 'Login' });
-};
-
-const bcrypt = require('bcryptjs');
-const crypto = require('crypto');
-const prisma = require('../../prisma');
-const { sendPasswordResetEmail } = require('../../mail');
 const speakeasy = require('speakeasy');
 
 exports.showLoginForm = (req, res) => {

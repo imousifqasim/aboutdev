@@ -6,14 +6,6 @@ exports.showRegistrationForm = (req, res) => {
   res.render('auth/register', { title: 'Register' });
 };
 
-const bcrypt = require('bcryptjs');
-const prisma = require('../../prisma');
-const { RESERVED_USERNAMES } = require('../../helpers');
-
-exports.showRegistrationForm = (req, res) => {
-  res.render('auth/register', { title: 'Register' });
-};
-
 exports.register = async (req, res) => {
   const { name, username, email, password, password_confirmation } = req.body;
   const errors = [];
@@ -78,31 +70,4 @@ exports.register = async (req, res) => {
 
   req.flash('success', 'Account created successfully! Please log in.');
   res.redirect('/login');
-};
-
-  await prisma.profile.create({
-    data: {
-      userId: user.id,
-      username: username.toLowerCase(),
-    },
-  });
-
-  await prisma.subscription.create({
-    data: {
-      userId: user.id,
-      plan: 'free',
-      startDate: new Date(),
-    },
-  });
-
-  req.session.regenerate((err) => {
-    if (err) {
-      req.flash('error', 'Registration succeeded but login failed. Please log in manually.');
-      return res.redirect('/login');
-    }
-    req.session.userId = user.id;
-    req.session.save(() => {
-      res.redirect('/dashboard');
-    });
-  });
 };
