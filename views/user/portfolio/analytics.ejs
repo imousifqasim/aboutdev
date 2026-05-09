@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<head><%- include('../../../layouts/partials/head') %><title>Portfolio Analytics - <%= appName %></title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+<div class="flex min-h-screen">
+    <%- include('../../../layouts/partials/user-sidebar') %>
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <%- include('../../../layouts/partials/dashboard-header', { title: 'Portfolio Analytics' }) %>
+        <main class="flex-1 overflow-y-auto p-6">
+            <%- include('../../../layouts/partials/flash') %>
+
+            <div class="max-w-7xl mx-auto space-y-6">
+                <!-- Overview Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Portfolio Views</p>
+                                <p class="text-2xl font-bold"><%= totals.portfolioViews %></p>
+                            </div>
+                            <i class="fas fa-eye text-2xl text-indigo-600"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Portfolio Clicks</p>
+                                <p class="text-2xl font-bold"><%= totals.portfolioClicks %></p>
+                            </div>
+                            <i class="fas fa-mouse-pointer text-2xl text-green-600"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Profile Views</p>
+                                <p class="text-2xl font-bold"><%= totals.profileViews %></p>
+                            </div>
+                            <i class="fas fa-user text-2xl text-blue-600"></i>
+                        </div>
+                    </div>
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-gray-600 dark:text-gray-400">Link Clicks</p>
+                                <p class="text-2xl font-bold"><%= totals.linkClicks %></p>
+                            </div>
+                            <i class="fas fa-link text-2xl text-purple-600"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Views Chart -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4">Portfolio Views (Last 30 Days)</h3>
+                        <canvas id="viewsChart" width="400" height="200"></canvas>
+                    </div>
+
+                    <!-- Devices Chart -->
+                    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold mb-4">Traffic by Device</h3>
+                        <canvas id="devicesChart" width="400" height="200"></canvas>
+                    </div>
+                </div>
+
+                <!-- Top Countries -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4">Top Countries</h3>
+                    <div class="space-y-3">
+                        <% countryStats.forEach(([country, views]) => { %>
+                        <div class="flex items-center justify-between">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-lg"><%= country %></span>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <div class="w-24 bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                                    <div class="bg-indigo-600 h-2 rounded-full" style="width: <%= (views / Math.max(...countryStats.map(([_, v]) => v))) * 100 %>%"></div>
+                                </div>
+                                <span class="text-sm font-medium"><%= views %></span>
+                            </div>
+                        </div>
+                        <% }) %>
+                        <% if (countryStats.length === 0) { %>
+                        <p class="text-gray-500 dark:text-gray-400 text-center py-8">No country data available yet</p>
+                        <% } %>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-semibold mb-4">Recent Activity (Last 30 Days)</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="border-b border-gray-200 dark:border-gray-700">
+                                    <th class="text-left py-2">Date</th>
+                                    <th class="text-left py-2">Portfolio Views</th>
+                                    <th class="text-left py-2">Portfolio Clicks</th>
+                                    <th class="text-left py-2">Top Country</th>
+                                    <th class="text-left py-2">Top Device</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% analytics.forEach(day => { %>
+                                <tr class="border-b border-gray-100 dark:border-gray-700">
+                                    <td class="py-2"><%= day.date.toLocaleDateString() %></td>
+                                    <td class="py-2"><%= day.portfolioViews %></td>
+                                    <td class="py-2"><%= day.portfolioClicks %></td>
+                                    <td class="py-2"><%= day.country || 'N/A' %></td>
+                                    <td class="py-2"><%= day.device || 'N/A' %></td>
+                                </tr>
+                                <% }) %>
+                                <% if (analytics.length === 0) { %>
+                                <tr>
+                                    <td colspan="5" class="text-center py-8 text-gray-500 dark:text-gray-400">No analytics data available yet</td>
+                                </tr>
+                                <% }) %>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Premium Features Notice -->
+                <% if (!user.isPremiumUser) { %>
+                <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-xl font-bold mb-2">Unlock Advanced Analytics</h3>
+                            <p class="mb-4">Get detailed insights, custom reports, and export options with premium.</p>
+                            <a href="/dashboard/payments" class="bg-white text-indigo-600 px-6 py-2 rounded-lg hover:bg-gray-100 transition font-semibold">
+                                Upgrade to Premium
+                            </a>
+                        </div>
+                        <i class="fas fa-chart-bar text-4xl opacity-50"></i>
+                    </div>
+                </div>
+                <% } %>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+// Analytics Charts
+document.addEventListener('DOMContentLoaded', function() {
+    // Views Chart
+    const viewsCtx = document.getElementById('viewsChart').getContext('2d');
+    const analyticsData = <%- JSON.stringify(analytics) %>;
+
+    const labels = analyticsData.map(day => new Date(day.date).toLocaleDateString()).reverse();
+    const viewsData = analyticsData.map(day => day.portfolioViews).reverse();
+
+    new Chart(viewsCtx, {
+        type: 'line',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Portfolio Views',
+                data: viewsData,
+                borderColor: '#4f46e5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                tension: 0.4,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    display: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                },
+                x: {
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.1)'
+                    }
+                }
+            }
+        }
+    });
+
+    // Devices Chart
+    const devicesCtx = document.getElementById('devicesChart').getContext('2d');
+    const deviceStats = <%- JSON.stringify(deviceStats) %>;
+
+    new Chart(devicesCtx, {
+        type: 'doughnut',
+        data: {
+            labels: deviceStats.map(([device]) => device.charAt(0).toUpperCase() + device.slice(1)),
+            datasets: [{
+                data: deviceStats.map(([, count]) => count),
+                backgroundColor: ['#4f46e5', '#10b981', '#f59e0b', '#ef4444'],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                }
+            }
+        }
+    });
+});
+</script>
+</body>
+</html>

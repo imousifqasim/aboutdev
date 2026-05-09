@@ -11,13 +11,20 @@ model User {
   id               Int              @id @default(autoincrement())
   name             String
   email            String           @unique
-  password         String
+  password         String?
   role             String           @default("user")
   isBanned         Boolean          @default(false) @map("is_banned")
   emailVerifiedAt  DateTime?        @map("email_verified_at")
   rememberToken    String?          @map("remember_token")
   resetToken       String?          @map("reset_token")
   resetTokenExpires DateTime?       @map("reset_token_expires")
+  twoFactorSecret  String?          @map("two_factor_secret")
+  twoFactorEnabled Boolean          @default(false) @map("two_factor_enabled")
+  googleId         String?          @unique @map("google_id")
+  githubId         String?          @unique @map("github_id")
+  provider         String           @default("local") // local, google, github
+  lastLoginAt      DateTime?        @map("last_login_at")
+  loginCount       Int              @default(0) @map("login_count")
   createdAt        DateTime         @default(now()) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
 
@@ -29,6 +36,9 @@ model User {
   subscriptions    Subscription[]
   analytics        Analytic[]
   contactMessages  ContactMessage[]
+  loginHistory     LoginHistory[]
+  notifications    Notification[]
+  mediaFiles       MediaFile[]
 
   @@map("users")
 }
@@ -154,16 +164,18 @@ model Subscription {
 }
 
 model Analytic {
-  id           Int      @id @default(autoincrement())
-  userId       Int      @map("user_id")
-  profileViews Int      @default(0) @map("profile_views")
-  linkClicks   Int      @default(0) @map("link_clicks")
-  date         DateTime @db.Date
-  referrer     String?
-  country      String?
-  device       String?
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id              Int      @id @default(autoincrement())
+  userId          Int      @map("user_id")
+  profileViews    Int      @default(0) @map("profile_views")
+  linkClicks      Int      @default(0) @map("link_clicks")
+  portfolioViews  Int      @default(0) @map("portfolio_views")
+  portfolioClicks Int      @default(0) @map("portfolio_clicks")
+  date            DateTime @db.Date
+  referrer        String?
+  country         String?
+  device          String?
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
@@ -184,6 +196,101 @@ model ContactMessage {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("contact_messages")
+}
+
+model LoginHistory {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  ipAddress String   @map("ip_address")
+  userAgent String?  @map("user_agent")
+  location  String?
+  device    String?
+  success   Boolean  @default(true)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("login_history")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  type      String   // follower, message, view, system
+  title     String
+  message   String   @db.Text
+  data      Json?    // Additional data for the notification
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
+
+model PortfolioTemplate {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  category    String
+  content     Json     // Template structure
+  preview     String?  // Preview image URL
+  isPremium   Boolean  @default(false) @map("is_premium")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("portfolio_templates")
+}
+
+model PortfolioSection {
+  id          Int      @id @default(autoincrement())
+  name        String
+  type        String   @unique
+  component   String   // React/Vue component name
+  settings    Json?    // Default settings
+  isPremium   Boolean  @default(false) @map("is_premium")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("portfolio_sections")
+}
+
+model MediaFile {
+  id          Int      @id @default(autoincrement())
+  userId      Int      @map("user_id")
+  filename    String
+  originalName String  @map("original_name")
+  mimeType    String   @map("mime_type")
+  size        Int
+  path        String
+  url         String
+  type        String   // image, video, document
+  folder      String   @default("general")
+  isPublic    Boolean  @default(true) @map("is_public")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("media_files")
+}
+
+model SubscriptionPlan {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String?  @db.Text
+  price       Decimal  @db.Decimal(10, 2)
+  currency    String   @default("USD")
+  interval    String   // monthly, yearly
+  features    Json     // Feature limits and permissions
+  isActive    Boolean  @default(true) @map("is_active")
+  stripeId    String?  @map("stripe_id")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("subscription_plans")
 }
 
 model SiteSetting {

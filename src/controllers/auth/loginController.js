@@ -7,6 +7,16 @@ exports.showLoginForm = (req, res) => {
   res.render('auth/login', { title: 'Login' });
 };
 
+const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
+const prisma = require('../../prisma');
+const { sendPasswordResetEmail } = require('../../mail');
+const speakeasy = require('speakeasy');
+
+exports.showLoginForm = (req, res) => {
+  res.render('auth/login', { title: 'Login' });
+};
+
 exports.login = async (req, res) => {
   const { email, password, remember } = req.body;
   if (!email || !password) {
@@ -15,7 +25,19 @@ exports.login = async (req, res) => {
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
-  if (!user || !(await bcrypt.compare(password, user.password))) {
+  if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
+    // Log failed login attempt
+    if (user) {
+      await prisma.loginHistory.create({
+        data: {
+          userId: user.id,
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          success: false
+        }
+      });
+    }
+
     req.flash('error', 'The provided credentials do not match our records.');
     return res.redirect('/login');
   }
@@ -25,6 +47,13 @@ exports.login = async (req, res) => {
     return res.redirect('/login');
   }
 
+  // Check if 2FA is enabled
+  if (user.twoFactorEnabled) {
+    req.session.pending2FAUserId = user.id;
+    return res.redirect('/login?2fa=1');
+  }
+
+  // Complete login
   req.session.regenerate((err) => {
     if (err) {
       req.flash('error', 'Login failed. Please try again.');
@@ -32,6 +61,25 @@ exports.login = async (req, res) => {
     }
     req.session.userId = user.id;
     req.session.save(() => {
+      // Update login info
+      prisma.user.update({
+        where: { id: user.id },
+        data: {
+          lastLoginAt: new Date(),
+          loginCount: { increment: 1 }
+        }
+      }).catch(console.error);
+
+      // Log successful login
+      prisma.loginHistory.create({
+        data: {
+          userId: user.id,
+          ipAddress: req.ip,
+          userAgent: req.get('User-Agent'),
+          success: true
+        }
+      }).catch(console.error);
+
       if (user.role === 'admin') {
         return res.redirect('/admin');
       }

@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false, portfolioData: JSON.parse('<%= portfolioData %>'), selectedSection: null, draggedSection: null, premiumFeatures: JSON.parse('<%= premiumFeatures %>'), aiModal: false, aiSuggestions: [], aiType: '', aiContext: '' }" :class="{ 'dark': darkMode }">
+<head><%- include('../../../layouts/partials/head') %><title>Portfolio Builder - <%= appName %></title>
+    <!-- Drag & Drop Library -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+    <!-- Rich Text Editor -->
+    <script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+    <!-- Portfolio Builder Styles -->
+    <style>
+        .portfolio-section { transition: all 0.2s ease; }
+        .portfolio-section:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .portfolio-section.selected { border-color: #4f46e5; box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2); }
+        .drag-handle { cursor: grab; }
+        .drag-handle:active { cursor: grabbing; }
+        .section-toolbar { opacity: 0; transition: opacity 0.2s ease; }
+        .portfolio-section:hover .section-toolbar { opacity: 1; }
+        .color-picker { display: none; }
+        .color-picker.show { display: block; }
+        .premium-overlay { position: relative; }
+        .premium-overlay::after { content: '🔒 Premium'; position: absolute; top: 8px; right: 8px; background: #f59e0b; color: white; padding: 2px 6px; border-radius: 4px; font-size: 10px; z-index: 10; }
+        .premium-disabled { opacity: 0.5; pointer-events: none; }
+    </style>
+</head>
+<body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
+<div class="flex min-h-screen">
+    <%- include('../../../layouts/partials/user-sidebar') %>
+    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+        <%- include('../../../layouts/partials/dashboard-header', { title: 'Portfolio Builder' }) %>
+        <main class="flex-1 overflow-y-auto">
+            <%- include('../../../layouts/partials/flash') %>
+
+            <!-- Builder Interface -->
+            <div class="flex h-full">
+                <!-- Sections Panel -->
+                <div class="w-80 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
+                    <h3 class="font-semibold text-lg mb-4">Add Sections</h3>
+                    <div class="space-y-2">
+                        <button @click="addSection('hero')" class="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
+                            <i class="fas fa-star text-yellow-500 mr-2"></i>Hero Section
+                        </button>
+                        <button @click="addSection('about')" class="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
+                            <i class="fas fa-user text-blue-500 mr-2"></i>About Section
+                        </button>
+                        <button @click="addSection('projects')" class="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
+                            <i class="fas fa-code-branch text-green-500 mr-2"></i>Projects
+                        </button>
+                        <button @click="addSection('skills')" class="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
+                            <i class="fas fa-tools text-purple-500 mr-2"></i>Skills
+                        </button>
+                        <button @click="addSection('services')" :class="premiumFeatures.services ? 'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition' : 'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 premium-overlay transition'" :disabled="!premiumFeatures.services" @click="premiumFeatures.services ? addSection('services') : null">
+                            <i class="fas fa-briefcase text-orange-500 mr-2"></i>Services
+                            <span x-show="!premiumFeatures.services" class="text-xs text-amber-600 dark:text-amber-400 block">Premium</span>
+                        </button>
+                        <button @click="addSection('gallery')" :class="premiumFeatures.gallery ? 'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition' : 'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 premium-overlay transition'" :disabled="!premiumFeatures.gallery" @click="premiumFeatures.gallery ? addSection('gallery') : null">
+                            <i class="fas fa-images text-pink-500 mr-2"></i>Gallery
+                            <span x-show="!premiumFeatures.gallery" class="text-xs text-amber-600 dark:text-amber-400 block">Premium</span>
+                        </button>
+                        <button @click="addSection('testimonials')" :class="premiumFeatures.testimonials ? 'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition' : 'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 premium-overlay transition'" :disabled="!premiumFeatures.testimonials" @click="premiumFeatures.testimonials ? addSection('testimonials') : null">
+                            <i class="fas fa-quote-left text-indigo-500 mr-2"></i>Testimonials
+                            <span x-show="!premiumFeatures.testimonials" class="text-xs text-amber-600 dark:text-amber-400 block">Premium</span>
+                        </button>
+                        <button @click="addSection('contact')" :class="premiumFeatures.contactForm ? 'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition' : 'w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 premium-overlay transition'" :disabled="!premiumFeatures.contactForm" @click="premiumFeatures.contactForm ? addSection('contact') : null">
+                            <i class="fas fa-envelope text-red-500 mr-2"></i>Contact Form
+                            <span x-show="!premiumFeatures.contactForm" class="text-xs text-amber-600 dark:text-amber-400 block">Premium</span>
+                        </button>
+                        <button @click="addSection('text')" class="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
+                            <i class="fas fa-align-left text-gray-500 mr-2"></i>Text Block
+                        </button>
+                        <button @click="addSection('button')" class="w-full text-left p-3 rounded-lg border border-gray-200 dark:border-gray-600 hover:border-indigo-300 dark:hover:border-indigo-500 transition">
+                            <i class="fas fa-mouse-pointer text-teal-500 mr-2"></i>Button
+                        </button>
+                    </div>
+
+                    <!-- Settings Panel -->
+                    <div class="mt-8">
+                        <h3 class="font-semibold text-lg mb-4">Portfolio Settings</h3>
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Theme</label>
+                                <select x-model="portfolioData.settings.theme" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                                    <option value="default">Default</option>
+                                    <option value="dark">Dark</option>
+                                    <option value="minimal">Minimal</option>
+                                    <option value="gradient">Gradient</option>
+                                    <option value="bold">Bold</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Layout</label>
+                                <select x-model="portfolioData.settings.layout" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                                    <option value="boxed">Boxed</option>
+                                    <option value="fullwidth">Full Width</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Canvas -->
+                <div class="flex-1 p-6 overflow-y-auto">
+                    <div class="max-w-4xl mx-auto">
+                        <!-- Canvas Header -->
+                        <div class="flex justify-between items-center mb-6">
+                            <h2 class="text-2xl font-bold">Portfolio Canvas</h2>
+                            <div class="flex space-x-2">
+                                <button @click="savePortfolio()" class="px-4 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">
+                                    <i class="fas fa-save mr-2"></i>Save
+                                </button>
+                                <button @click="aiModal = true" :class="premiumFeatures.aiSuggestions ? 'px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition' : 'px-4 py-2 bg-gray-400 text-white rounded-lg cursor-not-allowed'" :disabled="!premiumFeatures.aiSuggestions">
+                                    <i class="fas fa-magic mr-2"></i>AI Suggestions
+                                    <span x-show="!premiumFeatures.aiSuggestions" class="text-xs block">Premium</span>
+                                </button>
+                                <a :href="'/<%= user.profile.username %>/portfolio'" target="_blank" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                                    <i class="fas fa-eye mr-2"></i>Preview
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- Drop Zone -->
+                        <div id="portfolio-canvas" class="space-y-4 min-h-screen">
+                            <template x-for="(section, index) in portfolioData.sections" :key="index">
+                                <div class="portfolio-section bg-white dark:bg-gray-800 rounded-lg border-2 border-gray-200 dark:border-gray-600 p-6 relative group"
+                                     :class="{ 'selected': selectedSection === index }"
+                                     @click="selectSection(index)">
+
+                                    <!-- Section Toolbar -->
+                                    <div class="section-toolbar absolute top-2 right-2 flex space-x-1">
+                                        <button @click="moveSectionUp(index)" class="p-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
+                                            <i class="fas fa-arrow-up text-xs"></i>
+                                        </button>
+                                        <button @click="moveSectionDown(index)" class="p-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
+                                            <i class="fas fa-arrow-down text-xs"></i>
+                                        </button>
+                                        <button @click="duplicateSection(index)" class="p-1 bg-gray-100 dark:bg-gray-700 rounded hover:bg-gray-200 dark:hover:bg-gray-600">
+                                            <i class="fas fa-copy text-xs"></i>
+                                        </button>
+                                        <button @click="deleteSection(index)" class="p-1 bg-red-100 dark:bg-red-900 text-red-600 rounded hover:bg-red-200 dark:hover:bg-red-800">
+                                            <i class="fas fa-trash text-xs"></i>
+                                        </button>
+                                    </div>
+
+                                    <!-- Drag Handle -->
+                                    <div class="drag-handle absolute top-2 left-2 p-1 bg-gray-100 dark:bg-gray-700 rounded cursor-grab">
+                                        <i class="fas fa-grip-vertical text-gray-500"></i>
+                                    </div>
+
+                                    <!-- Section Content -->
+                                    <div class="ml-8">
+                                        <!-- Hero Section -->
+                                        <template x-if="section.type === 'hero'">
+                                            <div class="text-center py-12">
+                                                <h1 x-text="section.content.title || 'Your Name'" class="text-4xl font-bold mb-4" contenteditable @input="updateSectionContent(index, 'title', $event.target.textContent)"></h1>
+                                                <p x-text="section.content.subtitle || 'Your awesome tagline here'" class="text-xl text-gray-600 dark:text-gray-300" contenteditable @input="updateSectionContent(index, 'subtitle', $event.target.textContent)"></p>
+                                            </div>
+                                        </template>
+
+                                        <!-- About Section -->
+                                        <template x-if="section.type === 'about'">
+                                            <h2 class="text-2xl font-bold mb-4">About Me</h2>
+                                            <div x-html="section.content.bio || 'Tell your story here...'" class="prose dark:prose-invert max-w-none" contenteditable @input="updateSectionContent(index, 'bio', $event.target.innerHTML)"></div>
+                                        </template>
+
+                                        <!-- Projects Section -->
+                                        <template x-if="section.type === 'projects'">
+                                            <h2 class="text-2xl font-bold mb-4">My Projects</h2>
+                                            <div class="grid md:grid-cols-2 gap-4">
+                                                <template x-for="(project, pIndex) in section.content.items || []" :key="pIndex">
+                                                    <div class="border border-gray-200 dark:border-gray-600 rounded-lg p-4">
+                                                        <h3 x-text="project.title || 'Project Title'" contenteditable @input="updateProjectContent(index, pIndex, 'title', $event.target.textContent)"></h3>
+                                                        <p x-text="project.description || 'Project description...'" contenteditable @input="updateProjectContent(index, pIndex, 'description', $event.target.textContent)"></p>
+                                                        <div class="flex space-x-2 mt-2">
+                                                            <input x-model="project.demoUrl" placeholder="Demo URL" class="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded">
+                                                            <input x-model="project.githubUrl" placeholder="GitHub URL" class="flex-1 px-2 py-1 text-sm border border-gray-300 dark:border-gray-600 rounded">
+                                                        </div>
+                                                    </div>
+                                                </template>
+                                                <button @click="addProject(index)" class="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center hover:border-indigo-300 dark:hover:border-indigo-500 transition">
+                                                    <i class="fas fa-plus text-2xl text-gray-400 mb-2"></i>
+                                                    <p class="text-gray-500">Add Project</p>
+                                                </button>
+                                            </div>
+                                        </template>
+
+                                        <!-- Skills Section -->
+                                        <template x-if="section.type === 'skills'">
+                                            <h2 class="text-2xl font-bold mb-4">Skills</h2>
+                                            <div class="flex flex-wrap gap-2">
+                                                <template x-for="(skill, sIndex) in section.content.skills || []" :key="sIndex">
+                                                    <span class="bg-indigo-100 dark:bg-indigo-900 text-indigo-800 dark:text-indigo-200 px-3 py-1 rounded-full text-sm" x-text="skill"></span>
+                                                </template>
+                                                <input @keydown.enter="addSkill(index, $event.target.value); $event.target.value = ''" placeholder="Add skill..." class="px-3 py-1 border border-gray-300 dark:border-gray-600 rounded-full text-sm">
+                                            </div>
+                                        </template>
+
+                                        <!-- Text Section -->
+                                        <template x-if="section.type === 'text'">
+                                            <div x-html="section.content.html || '<p>Click to edit this text block...</p>'" class="prose dark:prose-invert max-w-none" contenteditable @input="updateSectionContent(index, 'html', $event.target.innerHTML)"></div>
+                                        </template>
+
+                                        <!-- Button Section -->
+                                        <template x-if="section.type === 'button'">
+                                            <div class="text-center">
+                                                <button :style="`background-color: ${section.content.bgColor || '#4f46e5'}; color: ${section.content.textColor || '#ffffff'}; padding: ${section.content.padding || '12px 24px'}; border-radius: ${section.content.borderRadius || '8px'}; border: ${section.content.border || 'none'}; font-size: ${section.content.fontSize || '16px'};`"
+                                                        x-text="section.content.text || 'Click Me'"
+                                                        contenteditable
+                                                        @input="updateSectionContent(index, 'text', $event.target.textContent)">
+                                                </button>
+                                            </div>
+                                        </template>
+                                    </div>
+                                </div>
+                            </template>
+
+                            <!-- Empty State -->
+                            <template x-if="portfolioData.sections.length === 0">
+                                <div class="text-center py-20">
+                                    <i class="fas fa-plus-circle text-6xl text-gray-300 mb-4"></i>
+                                    <h3 class="text-xl font-semibold text-gray-500 mb-2">Start Building Your Portfolio</h3>
+                                    <p class="text-gray-400">Add sections from the panel on the left to get started.</p>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Properties Panel -->
+                <div x-show="selectedSection !== null" class="w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 p-4 overflow-y-auto">
+                    <h3 class="font-semibold text-lg mb-4">Section Properties</h3>
+                    <template x-if="selectedSection !== null && portfolioData.sections[selectedSection]">
+                        <div class="space-y-4">
+                            <div>
+                                <label class="block text-sm font-medium mb-1">Section Type</label>
+                                <span class="text-sm text-gray-600 dark:text-gray-300 capitalize" x-text="portfolioData.sections[selectedSection].type"></span>
+                            </div>
+
+                            <!-- Hero Section Properties -->
+                            <template x-if="portfolioData.sections[selectedSection].type === 'hero'">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Background Image</label>
+                                    <input type="file" @change="uploadBackground($event, selectedSection)" accept="image/*" class="w-full text-sm">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Text Color</label>
+                                    <input type="color" x-model="portfolioData.sections[selectedSection].content.textColor" class="w-full h-10 border border-gray-300 dark:border-gray-600 rounded">
+                                </div>
+                            </template>
+
+                            <!-- Button Section Properties -->
+                            <template x-if="portfolioData.sections[selectedSection].type === 'button'">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Button Text</label>
+                                    <input type="text" x-model="portfolioData.sections[selectedSection].content.text" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Link URL</label>
+                                    <input type="url" x-model="portfolioData.sections[selectedSection].content.url" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Background Color</label>
+                                    <input type="color" x-model="portfolioData.sections[selectedSection].content.bgColor" class="w-full h-10 border border-gray-300 dark:border-gray-600 rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Text Color</label>
+                                    <input type="color" x-model="portfolioData.sections[selectedSection].content.textColor" class="w-full h-10 border border-gray-300 dark:border-gray-600 rounded">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Border Radius</label>
+                                    <input type="range" min="0" max="50" x-model="portfolioData.sections[selectedSection].content.borderRadius" class="w-full">
+                                    <span x-text="portfolioData.sections[selectedSection].content.borderRadius + 'px'" class="text-sm text-gray-600"></span>
+                                </div>
+                            </template>
+
+                            <!-- Text Section Properties -->
+                            <template x-if="portfolioData.sections[selectedSection].type === 'text'">
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Text Alignment</label>
+                                    <select x-model="portfolioData.sections[selectedSection].content.alignment" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                        <option value="left">Left</option>
+                                        <option value="center">Center</option>
+                                        <option value="right">Right</option>
+                                        <option value="justify">Justify</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-1">Font Size</label>
+                                    <select x-model="portfolioData.sections[selectedSection].content.fontSize" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg">
+                                        <option value="text-sm">Small</option>
+                                        <option value="text-base">Normal</option>
+                                        <option value="text-lg">Large</option>
+                                        <option value="text-xl">Extra Large</option>
+                                    </select>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script>
+// Portfolio Builder JavaScript
+document.addEventListener('alpine:init', () => {
+    Alpine.data('portfolioBuilder', () => ({
+        portfolioData: JSON.parse('<%= portfolioData %>'),
+        selectedSection: null,
+        draggedSection: null,
+
+        init() {
+            this.initDragAndDrop();
+            this.initRichTextEditors();
+        },
+
+        initDragAndDrop() {
+            const canvas = document.getElementById('portfolio-canvas');
+            if (canvas) {
+                new Sortable(canvas, {
+                    handle: '.drag-handle',
+                    animation: 150,
+                    onEnd: (evt) => {
+                        const sections = [...this.portfolioData.sections];
+                        const [removed] = sections.splice(evt.oldIndex, 1);
+                        sections.splice(evt.newIndex, 0, removed);
+                        this.portfolioData.sections = sections;
+                    }
+                });
+            }
+        },
+
+        initRichTextEditors() {
+            // Initialize TinyMCE for text sections
+            tinymce.init({
+                selector: '.portfolio-section .prose[contenteditable]',
+                menubar: false,
+                plugins: 'lists link image code',
+                toolbar: 'bold italic underline | bullist numlist | link | code',
+                inline: true,
+                setup: (editor) => {
+                    editor.on('change', () => {
+                        const sectionIndex = this.getSectionIndex(editor.getElement());
+                        if (sectionIndex !== -1) {
+                            this.updateSectionContent(sectionIndex, 'html', editor.getContent());
+                        }
+                    });
+                }
+            });
+        },
+
+        getSectionIndex(element) {
+            const sections = document.querySelectorAll('.portfolio-section');
+            for (let i = 0; i < sections.length; i++) {
+                if (sections[i].contains(element)) {
+                    return i;
+                }
+            }
+            return -1;
+        },
+
+        addSection(type) {
+            const newSection = {
+                type: type,
+                content: this.getDefaultContent(type)
+            };
+            this.portfolioData.sections.push(newSection);
+            this.selectedSection = this.portfolioData.sections.length - 1;
+        },
+
+        getDefaultContent(type) {
+            const defaults = {
+                hero: { title: 'Your Name', subtitle: 'Your awesome tagline here', textColor: '#000000' },
+                about: { bio: '<p>Tell your story here...</p>' },
+                projects: { items: [] },
+                skills: { skills: [] },
+                services: { services: [] },
+                gallery: { images: [] },
+                testimonials: { items: [] },
+                contact: {},
+                text: { html: '<p>Click to edit this text block...</p>', alignment: 'left', fontSize: 'text-base' },
+                button: { text: 'Click Me', url: '#', bgColor: '#4f46e5', textColor: '#ffffff', borderRadius: '8', padding: '12px 24px', fontSize: '16px' }
+            };
+            return defaults[type] || {};
+        },
+
+        selectSection(index) {
+            this.selectedSection = this.selectedSection === index ? null : index;
+        },
+
+        updateSectionContent(index, field, value) {
+            this.portfolioData.sections[index].content[field] = value;
+        },
+
+        updateProjectContent(sectionIndex, projectIndex, field, value) {
+            if (!this.portfolioData.sections[sectionIndex].content.items) {
+                this.portfolioData.sections[sectionIndex].content.items = [];
+            }
+            if (!this.portfolioData.sections[sectionIndex].content.items[projectIndex]) {
+                this.portfolioData.sections[sectionIndex].content.items[projectIndex] = {};
+            }
+            this.portfolioData.sections[sectionIndex].content.items[projectIndex][field] = value;
+        },
+
+        addProject(sectionIndex) {
+            if (!this.portfolioData.sections[sectionIndex].content.items) {
+                this.portfolioData.sections[sectionIndex].content.items = [];
+            }
+            this.portfolioData.sections[sectionIndex].content.items.push({
+                title: 'New Project',
+                description: 'Project description...',
+                demoUrl: '',
+                githubUrl: ''
+            });
+        },
+
+        addSkill(sectionIndex, skill) {
+            if (skill.trim() && !this.portfolioData.sections[sectionIndex].content.skills.includes(skill.trim())) {
+                this.portfolioData.sections[sectionIndex].content.skills.push(skill.trim());
+            }
+        },
+
+        deleteSection(index) {
+            this.portfolioData.sections.splice(index, 1);
+            if (this.selectedSection === index) {
+                this.selectedSection = null;
+            } else if (this.selectedSection > index) {
+                this.selectedSection--;
+            }
+        },
+
+        duplicateSection(index) {
+            const section = JSON.parse(JSON.stringify(this.portfolioData.sections[index]));
+            this.portfolioData.sections.splice(index + 1, 0, section);
+        },
+
+        moveSectionUp(index) {
+            if (index > 0) {
+                const sections = [...this.portfolioData.sections];
+                [sections[index - 1], sections[index]] = [sections[index], sections[index - 1]];
+                this.portfolioData.sections = sections;
+                if (this.selectedSection === index) {
+                    this.selectedSection = index - 1;
+                } else if (this.selectedSection === index - 1) {
+                    this.selectedSection = index;
+                }
+            }
+        },
+
+        moveSectionDown(index) {
+            if (index < this.portfolioData.sections.length - 1) {
+                const sections = [...this.portfolioData.sections];
+                [sections[index], sections[index + 1]] = [sections[index + 1], sections[index]];
+                this.portfolioData.sections = sections;
+                if (this.selectedSection === index) {
+                    this.selectedSection = index + 1;
+                } else if (this.selectedSection === index + 1) {
+                    this.selectedSection = index;
+                }
+            }
+        },
+
+        async uploadBackground(event, sectionIndex) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('_csrf', '<%= csrfToken %>');
+
+            try {
+                const response = await fetch('/dashboard/portfolio/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+                const result = await response.json();
+                if (result.success) {
+                    this.portfolioData.sections[sectionIndex].content.backgroundImage = result.url;
+                }
+            } catch (error) {
+                console.error('Upload failed:', error);
+            }
+        },
+
+        async savePortfolio() {
+            try {
+                const response = await fetch('/dashboard/portfolio/save', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': '<%= csrfToken %>'
+                    },
+                    body: JSON.stringify({
+                        portfolio_data: JSON.stringify(this.portfolioData)
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    // Show success message
+                    const flash = document.createElement('div');
+                    flash.className = 'fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg z-50';
+                    flash.textContent = result.message;
+                    document.body.appendChild(flash);
+                    setTimeout(() => flash.remove(), 3000);
+                }
+            } catch (error) {
+                console.error('Save failed:', error);
+            }
+        },
+
+        async generateAISuggestions() {
+            if (!this.aiType) return;
+
+            try {
+                const response = await fetch('/dashboard/portfolio/ai-suggestions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': '<%= csrfToken %>'
+                    },
+                    body: JSON.stringify({
+                        type: this.aiType,
+                        context: this.aiContext
+                    })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    this.aiSuggestions = result.suggestions;
+                }
+            } catch (error) {
+                console.error('AI suggestions failed:', error);
+            }
+        },
+
+        applyAISuggestion(suggestion) {
+            if (this.selectedSection !== null) {
+                if (typeof suggestion === 'string') {
+                    // For text content
+                    if (this.aiType === 'bio') {
+                        this.portfolioData.sections[this.selectedSection].content.bio = suggestion;
+                    } else if (this.aiType === 'hero_title') {
+                        this.portfolioData.sections[this.selectedSection].content.title = suggestion;
+                    } else if (this.aiType === 'hero_subtitle') {
+                        this.portfolioData.sections[this.selectedSection].content.subtitle = suggestion;
+                    }
+                } else {
+                    // For structured content like services
+                    if (this.aiType === 'services' && !this.portfolioData.sections[this.selectedSection].content.services) {
+                        this.portfolioData.sections[this.selectedSection].content.services = [];
+                    }
+                    if (this.aiType === 'services') {
+                        this.portfolioData.sections[this.selectedSection].content.services.push(suggestion);
+                    }
+                }
+            }
+            this.aiModal = false;
+            this.aiSuggestions = [];
+        }
+    }));
+});
+</script>
+
+<!-- AI Suggestions Modal -->
+<div x-show="aiModal" x-cloak class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" @click.self="aiModal = false">
+    <div class="bg-white dark:bg-gray-800 rounded-xl p-6 max-w-md w-full mx-4">
+        <h3 class="text-lg font-semibold mb-4">AI Content Suggestions</h3>
+        <div class="space-y-4">
+            <div>
+                <label class="block text-sm font-medium mb-1">Content Type</label>
+                <select x-model="aiType" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+                    <option value="">Select type...</option>
+                    <option value="bio">Bio/About Text</option>
+                    <option value="project_description">Project Description</option>
+                    <option value="services">Services</option>
+                    <option value="hero_title">Hero Title</option>
+                    <option value="hero_subtitle">Hero Subtitle</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium mb-1">Context (optional)</label>
+                <input type="text" x-model="aiContext" placeholder="e.g., web developer, designer, freelancer" class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700">
+            </div>
+            <div class="flex space-x-2">
+                <button @click="generateAISuggestions()" :disabled="!aiType" class="flex-1 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:bg-gray-400 disabled:cursor-not-allowed transition">
+                    <i class="fas fa-magic mr-2"></i>Generate
+                </button>
+                <button @click="aiModal = false" class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition">
+                    Cancel
+                </button>
+            </div>
+        </div>
+
+        <!-- Suggestions -->
+        <div x-show="aiSuggestions.length > 0" class="mt-4 space-y-2">
+            <h4 class="font-medium">Suggestions:</h4>
+            <div class="max-h-60 overflow-y-auto space-y-2">
+                <template x-for="(suggestion, index) in aiSuggestions" :key="index">
+                    <div class="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <p x-text="typeof suggestion === 'string' ? suggestion : suggestion.title + ': ' + suggestion.description" class="text-sm"></p>
+                        <button @click="applyAISuggestion(suggestion)" class="mt-2 text-xs text-indigo-600 hover:text-indigo-800">
+                            Use this
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

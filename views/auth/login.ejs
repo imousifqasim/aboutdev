@@ -47,6 +47,27 @@
         <% } %>
 
         <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl shadow-xl rounded-[1.5rem] p-6 border border-slate-200/50 dark:border-slate-800/50">
+            <!-- OAuth Buttons -->
+            <div class="mb-6 space-y-3">
+                <a href="/auth/google" class="w-full flex items-center justify-center py-3 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition text-sm font-medium">
+                    <i class="fab fa-google text-red-500 mr-3"></i>
+                    Continue with Google
+                </a>
+                <a href="/auth/github" class="w-full flex items-center justify-center py-3 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition text-sm font-medium">
+                    <i class="fab fa-github text-slate-900 dark:text-white mr-3"></i>
+                    Continue with GitHub
+                </a>
+            </div>
+
+            <div class="relative mb-6">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-slate-200 dark:border-slate-700"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="px-2 bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400">Or continue with email</span>
+                </div>
+            </div>
+
             <form method="POST" action="/login"><input type="hidden" name="_csrf" value="<%= csrfToken %>">
                 <div class="mb-5">
                     <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email</label>
