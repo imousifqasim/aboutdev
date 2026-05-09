@@ -139,11 +139,63 @@ dashboardRouter.post('/links/reorder', linkController.reorder);
 dashboardRouter.get('/payments', paymentController.index);
 dashboardRouter.post('/payments', setUploadType('screenshot'), upload.single('screenshot'), csrfValidateMultipart, paymentController.store);
 
+// Settings Routes
+dashboardRouter.get('/settings', (req, res) => res.render('user/settings/index', { title: 'Settings', user: req.user, csrfToken: req.csrfToken() }));
+
+// Account Settings
+dashboardRouter.get('/settings/account', (req, res) => res.render('user/settings/account', { title: 'Account Settings', user: req.user, csrfToken: req.csrfToken() }));
+dashboardRouter.post('/settings/account', (req, res) => {
+  // Account update logic
+  req.flash('success', 'Account settings updated successfully');
+  res.redirect('/dashboard/settings/account');
+});
+
 // Security Settings
-dashboardRouter.get('/settings/security', (req, res) => res.render('user/settings/security', { title: 'Security Settings', user: req.user }));
+dashboardRouter.get('/settings/security', (req, res) => res.render('user/settings/security', { title: 'Security Settings', user: req.user, csrfToken: req.csrfToken() }));
 dashboardRouter.get('/settings/security/2fa/setup', twoFactorController.show2FASetup);
 dashboardRouter.post('/settings/security/2fa/enable', twoFactorController.enable2FA);
 dashboardRouter.post('/settings/security/2fa/disable', twoFactorController.disable2FA);
+
+// Privacy Settings
+dashboardRouter.get('/settings/privacy', (req, res) => res.render('user/settings/privacy', { title: 'Privacy Settings', user: req.user, csrfToken: req.csrfToken() }));
+dashboardRouter.post('/settings/privacy', (req, res) => {
+  // Privacy update logic
+  req.flash('success', 'Privacy settings updated successfully');
+  res.redirect('/dashboard/settings/privacy');
+});
+
+// Notification Settings
+dashboardRouter.get('/settings/notifications', (req, res) => res.render('user/settings/notifications', { title: 'Notifications', user: req.user, csrfToken: req.csrfToken() }));
+dashboardRouter.post('/settings/notifications', (req, res) => {
+  // Notification preferences update logic
+  req.flash('success', 'Notification preferences updated successfully');
+  res.redirect('/dashboard/settings/notifications');
+});
+
+// Billing Settings
+dashboardRouter.get('/settings/billing', (req, res) => res.render('user/settings/billing', { title: 'Billing & Subscription', user: req.user, csrfToken: req.csrfToken() }));
+
+// Domain Settings
+dashboardRouter.get('/settings/domain', (req, res) => res.render('user/settings/domain', { title: 'Custom Domain', user: req.user, csrfToken: req.csrfToken() }));
+dashboardRouter.post('/settings/domain', (req, res) => {
+  // Domain connection logic
+  req.flash('success', 'Domain settings updated successfully');
+  res.redirect('/dashboard/settings/domain');
+});
+
+// Media Settings
+dashboardRouter.get('/settings/media', (req, res) => res.render('user/settings/media', { title: 'Media Library', user: req.user, csrfToken: req.csrfToken() }));
+
+// Social Settings
+dashboardRouter.get('/settings/social', (req, res) => res.render('user/settings/social', { title: 'Social Links', user: req.user, csrfToken: req.csrfToken() }));
+dashboardRouter.post('/settings/social', (req, res) => {
+  // Social links update logic
+  req.flash('success', 'Social links updated successfully');
+  res.redirect('/dashboard/settings/social');
+});
+
+// API Settings
+dashboardRouter.get('/settings/api', (req, res) => res.render('user/settings/api', { title: 'API & Integrations', user: req.user, csrfToken: req.csrfToken() }));
 
 router.use('/dashboard', dashboardRouter);
 

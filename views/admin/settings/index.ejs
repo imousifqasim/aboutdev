@@ -1,12 +1,14 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false, currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
 <head><%- include('../../layouts/partials/head') %><title>Settings - <%= appName %></title></head>
 <body class="min-h-screen bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 transition-colors">
 <div class="flex min-h-screen">
     <%- include('../../layouts/partials/admin-sidebar') %>
-    <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
-        <%- include('../../layouts/partials/dashboard-header', { title: 'Settings' }) %>
-        <main class="flex-1 overflow-y-auto p-5">
+    <div class="flex-1 flex overflow-hidden">
+        <%- include('../partials/submenu') %>
+        <div class="flex-1 flex flex-col min-h-screen overflow-hidden">
+            <%- include('../../layouts/partials/dashboard-header', { title: 'Settings' }) %>
+            <main class="flex-1 overflow-y-auto p-5">
             <%- include('../../layouts/partials/flash') %>
             <div class="max-w-4xl">
                 <div class="bg-white dark:bg-gray-800 rounded-2xl p-5 shadow-xl border border-gray-200 dark:border-gray-700">
@@ -46,6 +48,8 @@
                         <div><label class="block text-sm font-medium mb-1">Footer Text</label><input type="text" name="footer_text" value="<%= settings.footer_text || '' %>" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700"></div>
                         <button type="submit" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition"><i class="fas fa-save mr-2"></i>Save Settings</button>
                     </form>
+                </div>
+            </div>
                 </div>
             </div>
         </main>

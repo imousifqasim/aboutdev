@@ -1,0 +1,41 @@
+<!-- Admin Navigation Submenu -->
+<div class="w-64 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-6 space-y-2">
+    <h3 class="text-sm font-semibold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-4">Admin Panel</h3>
+    
+    <a href="/admin/dashboard" 
+       :class="currentPath === '/admin/dashboard' ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-tachometer-alt w-4"></i>Dashboard
+    </a>
+
+    <a href="/admin/users" 
+       :class="currentPath.startsWith('/admin/users') ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-users w-4"></i>Users
+    </a>
+
+    <a href="/admin/payments" 
+       :class="currentPath.startsWith('/admin/payments') ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-credit-card w-4"></i>Payments
+    </a>
+
+    <a href="/admin/subscriptions" 
+       :class="currentPath.startsWith('/admin/subscriptions') ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-crown w-4"></i>Subscriptions
+    </a>
+
+    <a href="/admin/settings" 
+       :class="currentPath.startsWith('/admin/settings') ? 'bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-600' : 'text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 border-l-4 border-transparent'"
+       class="flex items-center gap-3 px-4 py-3 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-cog w-4"></i>Settings
+    </a>
+
+    <hr class="my-4 border-gray-200 dark:border-gray-700">
+
+    <a href="/dashboard" 
+       class="flex items-center gap-3 px-4 py-3 text-gray-700 dark:text-gray-300 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-gray-50 dark:hover:bg-gray-700/50 rounded-r-lg transition text-sm font-medium">
+        <i class="fas fa-user w-4"></i>User Dashboard
+    </a>
+</div>

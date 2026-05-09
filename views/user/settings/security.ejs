@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true' }" :class="{ 'dark': darkMode }">
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,8 +12,12 @@
     <div class="flex">
         <%- include('../../layouts/partials/user-sidebar') %>
 
-        <main class="flex-1 p-8">
-            <div class="max-w-4xl mx-auto">
+        <main class="flex-1 flex">
+            <!-- Settings Submenu -->
+            <%- include('./partials/submenu') %>
+
+            <!-- Settings Content -->
+            <div class="flex-1 p-8">
                 <!-- Header -->
                 <div class="mb-8">
                     <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Security Settings</h1>

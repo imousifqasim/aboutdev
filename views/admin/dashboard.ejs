@@ -1,10 +1,12 @@
 <!DOCTYPE html>
-<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false }" :class="{ 'dark': darkMode }">
+<html lang="en" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', sidebarOpen: false, currentPath: window.location.pathname }" :class="{ 'dark': darkMode }">
 <head><%- include('../layouts/partials/head') %><title>Admin Dashboard - <%= appName %></title></head>
 <body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
 <div class="flex min-h-screen overflow-hidden">
     <%- include('../layouts/partials/admin-sidebar') %>
-    <div class="flex-1 flex flex-col overflow-hidden">
+    <div class="flex flex-1 overflow-hidden">
+        <%- include('./partials/submenu') %>
+        <div class="flex-1 flex flex-col overflow-hidden">
         <header class="flex items-center justify-between gap-4 px-6 py-5 bg-white/80 dark:bg-slate-950/90 border-b border-slate-200 dark:border-slate-800 backdrop-blur">
             <div>
                 <p class="text-xs uppercase tracking-[0.24em] text-slate-500 dark:text-slate-400">Admin Panel</p>
@@ -114,6 +116,7 @@
                 </div>
             </div>
         </main>
+        </div>
     </div>
 </div>
 <script>
